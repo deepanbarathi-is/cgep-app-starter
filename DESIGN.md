@@ -15,7 +15,7 @@ I'm choosing HIPAA Security Rule as my primary framework. Acme Health handles PH
 | GAP-03: no TLS-deny bucket policy | 164.312(e)(1) | Yes, new bucket policy | Yes | `s3-bucket-ssl-requests-only` | Direct fit: guards against unauthorized access during transmission |
 | GAP-04: no S3 versioning | 164.308(a)(7) | Yes, from the module | No dedicated policy | `s3-bucket-versioning-enabled` | Terraform and monitoring only, not one of my 5 flagship policies |
 | GAP-05: Lambda not in VPC | 164.312(e)(1) | Yes, `vpc_config` added to the Lambda, plus a private route table, Gateway Endpoints (S3 + DynamoDB), and a security group | Yes | `lambda-inside-vpc` | Same control family as GAP-03, different mechanism: path isolation, not channel encryption. I chose Gateway Endpoints over a NAT Gateway because they're free, keep PHI traffic off the public internet entirely, and have no per-AZ capacity ceiling |
-| GAP-06: no concurrency/DLQ/X-Ray | not HIPAA-mapped (SOC 2 CC7.2 / CMMC SI.L2-3.14.6 only) | Partial: reserved concurrency + X-Ray only | No | No | I'm skipping the DLQ piece deliberately: this Lambda is invoked synchronously via API Gateway, so a DLQ, which is designed for async failures, wouldn't capture anything under normal operation. I'm documenting this as an accepted gap rather than adding a non-functional checkbox |
+| GAP-06: no concurrency/DLQ/X-Ray | not HIPAA-mapped (SOC 2 CC7.2 / CMMC SI.L2-3.14.6 only) | Partial: X-Ray tracing only | No | No | I'm skipping the DLQ piece deliberately: this Lambda is invoked synchronously via API Gateway, so a DLQ, which is designed for async failures, wouldn't capture anything under normal operation. I'm documenting this as an accepted gap rather than adding a non-functional checkbox. Reserved concurrency is also not possible in this account: the total Lambda concurrency limit is 10, and AWS requires 100 to stay unreserved. API Gateway throttling (GAP-08) is the compensating control |
 | GAP-07: IAM `dynamodb:*`/`s3:*` | 164.312(a)(1) | Yes, scoped to specific actions, edited in place | Yes | none | Textbook least privilege. No Config rule can see this gap: the managed IAM rules skip inline policies, and the starter's policy is inline, so the Rego gate is my only detection here |
 | GAP-08: no API GW logging/throttling/WAF | 164.312(b), logging only | Logging + throttling yes; WAF likely stays undone | No dedicated policy | `api-gwv2-access-logs-enabled` | Throttling and WAF are availability and attack-surface concerns, not audit trail. Citing 164.312(b) for those would repeat the same over-claim I caught on GAP-01 |
 
@@ -83,13 +83,13 @@ I also add cross-references to SOC 2 and CMMC controls in `props` on the relevan
 
 ## Decisions and trade-offs
 
-- **Region:** us-east-1, matching the starter's default. The scenario states no data-residency requirement.
-- **Object Lock mode:** GOVERNANCE on the evidence vault. COMPLIANCE is the stronger tamper-resistance claim because nobody, including root, can delete evidence before retention expires, but it also means I cannot clean up a mistake. GOVERNANCE lets a principal with `s3:BypassGovernanceRetention` override the lock, which I accept for a short-lived, single-developer project. For production I would use COMPLIANCE.
-- **Object Lock retention:** 30 days on the evidence vault. Reviews take 5 to 7 business days and the reviewer checks that retention is still active, so a short retention such as 1 day would have expired by then. I'll re-run the pipeline shortly before submitting so a fresh bundle exists.
-- **Apply on merge:** the pipeline applies automatically on merge to main, after the policy gate passes. This is fully continuous, but it gives the pipeline real deploy power, so I'm limiting the risk with branch protection, a required status check, and an OIDC role scoped to this repository.
-- **Account model:** one AWS account, my sandbox. For production the evidence vault would live in a separate account, so a compromise of the audited account could not quietly rewrite the evidence.
-- **Terraform versus policy:** I close each gap in Terraform and use Rego to stop it coming back.
-- **Write-up:** about five pages, built from this doc, with a control-to-code coverage table and an honest list of what I didn't get to.
+- I'm using us-east-1, matching the starter's default. The scenario states no data-residency requirement.
+- The evidence vault uses Object Lock in GOVERNANCE mode. COMPLIANCE is the stronger tamper-resistance claim because nobody, including root, can delete evidence before retention expires, but it also means I cannot clean up a mistake. GOVERNANCE lets a principal with `s3:BypassGovernanceRetention` override the lock, which I accept for a short-lived, single-developer project. For production I would use COMPLIANCE.
+- Retention on the vault is 30 days. Reviews take 5 to 7 business days and the reviewer checks that retention is still active, so a short retention such as 1 day would have expired by then. I'll re-run the pipeline shortly before submitting so a fresh bundle exists.
+- The pipeline applies automatically on merge to main, after the policy gate passes. This is fully continuous, but it gives the pipeline real deploy power, so I'm limiting the risk with branch protection, a required status check, and an OIDC role scoped to this repository.
+- Everything runs in one AWS account, my sandbox. For production the evidence vault would live in a separate account, so a compromise of the audited account could not quietly rewrite the evidence.
+- I close each gap in Terraform and use Rego to stop it coming back.
+- The write-up will run about five pages, built from this doc, with a control-to-code coverage table and an honest list of what I didn't get to.
 
 ## Engineering hygiene decisions
 
@@ -118,6 +118,7 @@ The repo history will show two pull requests: one green PR that merges, and one 
 ## What I'm deliberately not doing, honest and stated
 
 - GAP-06's DLQ, since synchronous invocation makes it non-functional here.
+- GAP-06's reserved concurrency, since this account's Lambda concurrency limit of 10 leaves nothing to reserve (AWS requires 100 to stay unreserved). API Gateway throttling is the compensating control.
 - GAP-08's WAF, since the ongoing cost and complexity isn't worth the added scope for this timeline.
 - A Config rule for GAP-07, since AWS's managed IAM rules don't evaluate inline policies.
 - A remote Terraform state backend: a documented choice, not something I built.
@@ -125,8 +126,8 @@ The repo history will show two pull requests: one green PR that merges, and one 
 
 ## Open decisions
 
-- **OSCAL catalog for HIPAA.** NIST publishes OSCAL catalogs for SP 800-53 and SP 800-171, but none for HIPAA or SP 800-66 (I checked the usnistgov/oscal-content repository). The starter's FRAMEWORKS.md suggests citing SP 800-66 Rev. 2 as the catalog and putting the 164.x sections in `props`. I haven't decided how the component's `control-implementation.source` and the profile will point at it, and I'll settle that before building this layer.
-- **Pass threshold.** The live rubric gives it as 65 in its header and 80 in its body, and the Capstone Overview PDF (also v1.1.0) says 65. I'm designing to the stricter 80 until that's settled.
+- The OSCAL catalog for HIPAA is still open. NIST publishes OSCAL catalogs for SP 800-53 and SP 800-171, but none for HIPAA or SP 800-66 (I checked the usnistgov/oscal-content repository). The starter's FRAMEWORKS.md suggests citing SP 800-66 Rev. 2 as the catalog and putting the 164.x sections in `props`. I haven't decided how the component's `control-implementation.source` and the profile will point at it, and I'll settle that before building this layer.
+- The pass threshold is also unsettled. The live rubric gives it as 65 in its header and 80 in its body, and the Capstone Overview PDF (also v1.1.0) says 65. I'm designing to the stricter 80 until that's clear.
 
 ## Requirements sources and how I ranked them
 

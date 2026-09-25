@@ -141,7 +141,8 @@ resource "aws_s3_bucket" "uploads" {
 ######################################################################
 # Lambda — the intake handler.
 # GAP-05 (closed): runs inside the VPC's private subnets, see network.tf.
-# GAP-06: no reserved concurrency, no DLQ, no X-Ray.
+# GAP-06 (partial): X-Ray tracing is on. No DLQ (the function is invoked
+#         synchronously) and no reserved concurrency (account limit of 10).
 # GAP-07 (closed): the role policy below is limited to the exact calls the
 #         handler makes.
 ######################################################################
@@ -190,6 +191,11 @@ data "aws_iam_policy_document" "lambda_data_access" {
     actions   = ["kms:GenerateDataKey", "kms:Decrypt"]
     resources = [module.uploads_storage.kms_key_arn, aws_kms_key.dynamodb.arn]
   }
+  statement {
+    sid       = "SendTraces"
+    actions   = ["xray:PutTraceSegments", "xray:PutTelemetryRecords"]
+    resources = ["*"]
+  }
 }
 
 resource "aws_iam_role_policy" "lambda_inline" {
@@ -220,6 +226,12 @@ resource "aws_lambda_function" "intake" {
   vpc_config {
     subnet_ids         = aws_subnet.private[*].id
     security_group_ids = [aws_security_group.lambda.id]
+  }
+
+  # GAP-06 (not HIPAA-mapped; SOC 2 CC7.2, CMMC SI.L2-3.14.6): trace each request
+  # so slow or failing calls can be located.
+  tracing_config {
+    mode = "Active"
   }
 
   # Order matters: the role needs its network permission, and the endpoints and
