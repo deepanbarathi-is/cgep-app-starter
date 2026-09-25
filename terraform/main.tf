@@ -111,8 +111,13 @@ resource "aws_dynamodb_table" "intake" {
     type = "S"
   }
 
-  # No server_side_encryption block. Defaults to AWS-owned key.
-  # GAP-02: capstone learner expected to add this with a customer-owned key.
+  # GAP-02 (HIPAA 164.312(a)(2)(iv), 164.312(a)(1)): encrypt with a
+  # customer-managed key instead of the AWS-owned default.
+  server_side_encryption {
+    enabled     = true
+    kms_key_arn = aws_kms_key.dynamodb.arn
+  }
+
 }
 
 ######################################################################
