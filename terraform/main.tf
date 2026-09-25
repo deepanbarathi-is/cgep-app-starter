@@ -98,7 +98,7 @@ resource "aws_route_table_association" "public" {
 
 ######################################################################
 # DynamoDB — submissions table.
-# GAP-02: encryption uses AWS-owned default, not a CMK you control.
+# GAP-02 (closed): encrypted with a customer-managed key, defined in kms.tf.
 ######################################################################
 
 resource "aws_dynamodb_table" "intake" {
@@ -122,12 +122,10 @@ resource "aws_dynamodb_table" "intake" {
 
 ######################################################################
 # S3 — uploads bucket.
-# GAP-01: relies on AWS-managed SSE-S3 (default since 2023) instead of
-#         SSE-KMS with a customer CMK. PHI keys are not under customer
-#         custody.
-# GAP-03: no bucket policy denying non-TLS requests
-#         (aws:SecureTransport).
-# GAP-04: no versioning. PHI overwrites are unrecoverable.
+# GAP-01 (closed): SSE-KMS with a customer-managed key, applied by the
+#         compliant-storage module (see s3-hardening.tf).
+# GAP-03 (closed): bucket policy denying non-TLS requests, in s3-hardening.tf.
+# GAP-04 (closed): versioning enabled by the compliant-storage module.
 #
 # Note: AWS now defaults new buckets to SSE-S3 + full public access block.
 # The "gaps" here are real residual gaps once those defaults are in place.
@@ -137,15 +135,15 @@ resource "aws_s3_bucket" "uploads" {
   bucket = "${local.name_prefix}-uploads-${local.suffix}"
 }
 
-# (Intentionally omitted: SSE-KMS encryption with a customer CMK,
-#  bucket policy enforcing aws:SecureTransport, versioning, lifecycle.
-#  These are the gaps the learner closes.)
+# Hardening for this bucket lives in s3-hardening.tf and
+# modules/compliant-storage, not in this file.
 
 ######################################################################
 # Lambda — the intake handler.
 # GAP-05: not deployed inside the VPC.
 # GAP-06: no reserved concurrency, no DLQ, no X-Ray.
-# GAP-07: IAM role has dynamodb:* and s3:* on the resources (over-broad).
+# GAP-07 (closed): the role policy below is limited to the exact calls the
+#         handler makes.
 ######################################################################
 
 data "archive_file" "handler" {
@@ -172,27 +170,34 @@ resource "aws_iam_role_policy_attachment" "lambda_basic" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-# GAP-07: deliberately broad permissions on the workload data stores.
-resource "aws_iam_role_policy" "lambda_inline" {
-  name = "intake-data-access"
-  role = aws_iam_role.lambda.id
+# GAP-07 (HIPAA 164.312(a)(1)): least privilege. The handler writes one item to
+# the table and one object under uploads/, so that is all the role may do.
+data "aws_iam_policy_document" "lambda_data_access" {
+  statement {
+    sid       = "WriteSubmissions"
+    actions   = ["dynamodb:PutItem"]
+    resources = [aws_dynamodb_table.intake.arn]
+  }
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect   = "Allow"
-        Action   = "dynamodb:*"
-        Resource = aws_dynamodb_table.intake.arn
-      },
-      {
-        Effect   = "Allow"
-        Action   = "s3:*"
-        Resource = ["${aws_s3_bucket.uploads.arn}", "${aws_s3_bucket.uploads.arn}/*"]
-      }
-    ]
-  })
+  statement {
+    sid       = "WriteAttachments"
+    actions   = ["s3:PutObject"]
+    resources = ["${aws_s3_bucket.uploads.arn}/uploads/*"]
+  }
+
+  statement {
+    sid       = "UseDataKeys"
+    actions   = ["kms:GenerateDataKey", "kms:Decrypt"]
+    resources = [module.uploads_storage.kms_key_arn, aws_kms_key.dynamodb.arn]
+  }
 }
+
+resource "aws_iam_role_policy" "lambda_inline" {
+  name   = "intake-data-access"
+  role   = aws_iam_role.lambda.id
+  policy = data.aws_iam_policy_document.lambda_data_access.json
+}
+
 
 resource "aws_lambda_function" "intake" {
   function_name    = "${local.name_prefix}-handler-${local.suffix}"
