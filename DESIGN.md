@@ -51,6 +51,7 @@ terraform/
 ├── kms.tf                   # dedicated CMK for the DynamoDB table (GAP-02)
 ├── s3-hardening.tf          # module call for the uploads bucket, TLS-deny bucket policy (GAP-03)
 ├── network.tf               # private route table, Gateway Endpoints, Lambda security group (GAP-05)
+├── api-logging.tf           # access log group for the API (GAP-08)
 ├── evidence-vault.tf
 ├── cloudtrail.tf
 ├── oidc-trust.tf

@@ -249,7 +249,8 @@ resource "aws_lambda_function" "intake" {
 
 ######################################################################
 # API Gateway — HTTP API in front of the Lambda.
-# GAP-08: no access logging, no throttling, no WAF.
+# GAP-08 (partial): access logging and throttling are on. No WAF, because of
+#         its ongoing cost and added scope.
 ######################################################################
 
 resource "aws_apigatewayv2_api" "intake" {
@@ -275,7 +276,28 @@ resource "aws_apigatewayv2_stage" "default" {
   api_id      = aws_apigatewayv2_api.intake.id
   name        = "$default"
   auto_deploy = true
-  # GAP-08: no access_log_settings. Learner expected to wire CloudWatch logs.
+  # GAP-08 (HIPAA 164.312(b)): record who called the API, when, and the outcome.
+  # Only request metadata is logged, never the request body, so no PHI ends up
+  # in the logs.
+  access_log_settings {
+    destination_arn = aws_cloudwatch_log_group.api_access.arn
+    format = jsonencode({
+      requestId    = "$context.requestId"
+      requestTime  = "$context.requestTime"
+      sourceIp     = "$context.identity.sourceIp"
+      httpMethod   = "$context.httpMethod"
+      routeKey     = "$context.routeKey"
+      status       = "$context.status"
+      responseSize = "$context.responseLength"
+    })
+  }
+
+  # Cap the request rate before it reaches the Lambda. This is the compensating
+  # control for the reserved concurrency this account cannot set.
+  default_route_settings {
+    throttling_burst_limit = 10
+    throttling_rate_limit  = 5
+  }
 }
 
 resource "aws_lambda_permission" "apigw" {
