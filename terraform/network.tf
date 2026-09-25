@@ -50,3 +50,9 @@ resource "aws_vpc_security_group_egress_rule" "lambda_to_dynamodb" {
   from_port         = 443
   to_port           = 443
 }
+# GAP-05 (HIPAA 164.312(e)(1)): a Lambda inside a VPC needs permission to manage
+# its own network interfaces.
+resource "aws_iam_role_policy_attachment" "lambda_vpc" {
+  role       = aws_iam_role.lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}

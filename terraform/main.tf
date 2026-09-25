@@ -140,7 +140,7 @@ resource "aws_s3_bucket" "uploads" {
 
 ######################################################################
 # Lambda — the intake handler.
-# GAP-05: not deployed inside the VPC.
+# GAP-05 (closed): runs inside the VPC's private subnets, see network.tf.
 # GAP-06: no reserved concurrency, no DLQ, no X-Ray.
 # GAP-07 (closed): the role policy below is limited to the exact calls the
 #         handler makes.
@@ -215,8 +215,24 @@ resource "aws_lambda_function" "intake" {
     }
   }
 
-  # GAP-05: no vpc_config block. Learner expected to add one referencing
-  # aws_subnet.private[*] and a hardened security group.
+  # GAP-05 (HIPAA 164.312(e)(1)): run inside the VPC's private subnets, with a
+  # security group that only allows HTTPS out to the S3 and DynamoDB endpoints.
+  vpc_config {
+    subnet_ids         = aws_subnet.private[*].id
+    security_group_ids = [aws_security_group.lambda.id]
+  }
+
+  # Order matters: the role needs its network permission, and the endpoints and
+  # routes need to exist, before the function is attached to the VPC.
+  depends_on = [
+    aws_iam_role_policy_attachment.lambda_vpc,
+    aws_route_table_association.private,
+    aws_vpc_endpoint.s3,
+    aws_vpc_endpoint.dynamodb,
+    aws_vpc_security_group_egress_rule.lambda_to_s3,
+    aws_vpc_security_group_egress_rule.lambda_to_dynamodb,
+  ]
+
 }
 
 ######################################################################
