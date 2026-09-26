@@ -1,0 +1,115 @@
+# GRC gate. On every pull request it checks the code, plans the change with a read-only
+# AWS role, and runs the HIPAA policy suite against the plan. A failed policy fails the
+# job, so the pull request cannot merge.
+name: grc-gate
+
+on:
+  pull_request:
+    branches: [main]
+
+# id-token lets the job ask GitHub for the signed token that AWS trusts. Nothing else.
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  PLAN_ROLE_ARN: arn:aws:iam::650251713518:role/acme-health-pipeline-plan
+  TERRAFORM_VERSION: "1.16.1"
+  OPA_VERSION: "1.19.0"
+  CONFTEST_VERSION: "0.70.1"
+  TF_IN_AUTOMATION: "true"
+
+jobs:
+  plan-and-gate:
+    name: Plan and policy gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v7
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false
+
+      - name: Install OPA and Conftest
+        run: |
+          mkdir -p "$HOME/bin"
+          curl -fsSL -o "$HOME/bin/opa" \
+            "https://github.com/open-policy-agent/opa/releases/download/v${OPA_VERSION}/opa_linux_amd64_static"
+          chmod +x "$HOME/bin/opa"
+          curl -fsSL \
+            "https://github.com/open-policy-agent/conftest/releases/download/v${CONFTEST_VERSION}/conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz" \
+            | tar -xz -C "$HOME/bin" conftest
+          echo "$HOME/bin" >> "$GITHUB_PATH"
+
+      - name: Check Terraform formatting
+        working-directory: terraform
+        run: terraform fmt -check -recursive
+
+      - name: Check and test the policies
+        run: |
+          test -z "$(opa fmt --list policies)"
+          opa check policies --strict
+          opa test policies
+
+      - name: Break tests for the policy gate
+        run: test/policy-breaks.sh
+
+      - name: Log in to AWS with the plan role
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ env.PLAN_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform init and validate
+        working-directory: terraform
+        run: |
+          terraform init -input=false
+          terraform validate
+
+      # The plan role is read-only, so it cannot take the state lock. Pull request plans
+      # never write state, so -lock=false is safe here.
+      - name: Terraform plan
+        working-directory: terraform
+        env:
+          TF_VAR_alert_email: ${{ secrets.ALERT_EMAIL }}
+        run: |
+          terraform plan -lock=false -input=false -no-color -out=tfplan
+          terraform show -json tfplan > plan.json
+
+      # An empty or malformed plan would pass every policy without checking anything.
+      - name: Refuse a plan that is not a real plan
+        working-directory: terraform
+        run: jq -e '(.resource_changes | type == "array") and (.resource_changes | length > 0)' plan.json
+
+      - name: Policy gate (Conftest)
+        run: conftest test terraform/plan.json --policy policies --all-namespaces
+
+      # The plan JSON carries variable values, including the alert email. Remove them
+      # before the file is kept as an artifact on a public repository.
+      - name: Redact the plan for the artifact
+        if: always()
+        working-directory: terraform
+        env:
+          ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
+        run: |
+          if [ -f plan.json ]; then
+            if [ -n "$ALERT_EMAIL" ]; then
+              jq --arg e "$ALERT_EMAIL" 'del(.variables) | walk(if type == "string" then split($e) | join("<redacted>") else . end)' plan.json > plan-redacted.json
+            else
+              jq 'del(.variables)' plan.json > plan-redacted.json
+            fi
+          fi
+
+      - name: Keep the plan as an artifact
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: plan-json
+          path: terraform/plan-redacted.json
+          retention-days: 30
+          if-no-files-found: warn
