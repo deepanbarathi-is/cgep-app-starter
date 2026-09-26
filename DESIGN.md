@@ -32,9 +32,11 @@ I'm using AWS Config with targeted managed rules instead of custom Lambda detect
 - `lambda-inside-vpc` for GAP-05
 - `api-gwv2-access-logs-enabled` for GAP-08
 
-Config also needs a configuration recorder and a delivery channel, which I'll define alongside the rules.
+Config also needs a configuration recorder, a delivery channel, and somewhere to write its records. I gave it its own bucket, hardened by the same module as the other buckets, and its own IAM role that can only write under the Config prefix of that bucket and use that bucket's key. The recorder watches only the four resource types the six rules look at (S3 buckets, DynamoDB tables, Lambda functions, and API Gateway stages), which keeps the per-item charge small. The rules are detective controls. They tell me when something drifts, and the Rego policies in Layer 2 are the preventive side.
 
-For alert routing, an EventBridge rule on Config's compliance-change events feeds an SNS topic. This gives real alert routing without building a full notification system.
+Config evaluates every S3 bucket in the account, not just the workload's, so it flagged the evidence vault I built in Lab 2.5 as non-compliant on the KMS and TLS rules. That bucket uses SSE-S3 and has no TLS-deny policy, which is what those two rules exist to catch. I'm leaving it alone and treating the finding as proof that the monitoring works on real data.
+
+For alert routing, an EventBridge rule on Config's compliance-change events feeds an SNS topic. This gives real alert routing without building a full notification system. The topic is encrypted with its own KMS key, because the AWS-managed SNS key does not let EventBridge publish to it and alerts would silently never arrive. The email subscription is optional: the `alert_email` variable defaults to an empty string, so anyone can plan and apply the code without giving an address, and the topic and rule still exist. I keep my own address in a gitignored `terraform.tfvars`.
 
 For detection test coverage, `scripts/verify-controls.sh` deliberately reintroduces one gap (for example, removing the versioning setting through the CLI), polls AWS Config for a `NON_COMPLIANT` result, then reverts the change. This proves the control actually fires instead of just assuming it does.
 
@@ -52,11 +54,13 @@ terraform/
 ├── s3-hardening.tf          # module call for the uploads bucket, TLS-deny bucket policy (GAP-03)
 ├── network.tf               # private route table, Gateway Endpoints, Lambda security group (GAP-05)
 ├── api-logging.tf           # access log group for the API (GAP-08)
-├── evidence-vault.tf
-├── cloudtrail.tf
-├── oidc-trust.tf
-└── monitoring.tf            # Config recorder, rules, SNS, EventBridge
+├── evidence-vault.tf        # Object Lock vault, GOVERNANCE, 30 days, hardened by the module
+├── cloudtrail.tf            # multi-region trail with log-file validation, its own key and log bucket (164.312(b))
+├── oidc-trust.tf            # planned for Layer 3
+└── monitoring.tf            # Config recorder, rules, SNS, EventBridge (164.312(b))
 ```
+
+The module also hardens the Config bucket, so it is called three times: uploads, evidence, and Config. The CloudTrail log bucket is the one bucket that does not use it. CloudTrail delivers as a service principal, and the module's key policy only trusts my own account, so the trail gets a dedicated key whose policy names CloudTrail and this one trail. The bucket still uses KMS, so the GAP-01 policy holds for every bucket in the account.
 
 Some gaps can be closed with new resources placed next to the starter's, which is the case for GAP-01, 03, and 04. Others live inside a starter resource as an inline block (GAP-02's `server_side_encryption`, GAP-05's `vpc_config`, GAP-06's concurrency and tracing, GAP-08's access logging) or replace an existing policy (GAP-07). Defining the same resource a second time in another file would be an error, and the starter's own comments say the learner is expected to add these in place. So I'm editing `main.tf` directly and marking each change with its GAP comment.
 
@@ -90,6 +94,8 @@ I also add cross-references to SOC 2 and CMMC controls in `props` on the relevan
 - The pipeline applies automatically on merge to main, after the policy gate passes. This is fully continuous, but it gives the pipeline real deploy power, so I'm limiting the risk with branch protection, a required status check, and an OIDC role scoped to this repository.
 - Everything runs in one AWS account, my sandbox. For production the evidence vault would live in a separate account, so a compromise of the audited account could not quietly rewrite the evidence.
 - I close each gap in Terraform and use Rego to stop it coming back.
+- The capstone overview says the capstone vault is Lab 2.5's vault. I read that as the same design, not the same bucket. The Layer 1 list asks for a KMS-encrypted vault defined in this repo's Terraform, and my Lab 2.5 bucket lives in another repo and uses SSE-S3, so I rebuilt the vault here from the lab's pattern and left the old bucket untouched. It holds the signed bundles from Lab 4.4, so I'm not deleting it before the capstone is reviewed.
+- I applied the Layer 1 baseline once by hand from the feature branch, in small chunks, testing each before the next: the workload gaps first, then the vault, then CloudTrail, then monitoring. The brief says not to start the pipeline until the baseline applies clean, and small chunks meant a failure pointed at a few resources instead of forty.
 - The write-up will run about five pages, built from this doc, with a control-to-code coverage table and an honest list of what I didn't get to.
 
 ## Engineering hygiene decisions
@@ -122,6 +128,8 @@ The repo history will show two pull requests: one green PR that merges, and one 
 - GAP-06's reserved concurrency, since this account's Lambda concurrency limit of 10 leaves nothing to reserve (AWS requires 100 to stay unreserved). API Gateway throttling is the compensating control.
 - GAP-08's WAF, since the ongoing cost and complexity isn't worth the added scope for this timeline.
 - A Config rule for GAP-07, since AWS's managed IAM rules don't evaluate inline policies.
+- CloudTrail data events for S3 and DynamoDB. They would record every object and item access, which is closer to what an auditor wants for PHI, but they are billed per event and the trail's management events already cover who changed what.
+- Recording every Config resource type. I record only the four the rules use.
 - A remote Terraform state backend: a documented choice, not something I built.
 - Automated retry and dead-letter handling on the evidence pipeline itself, which I'm noting as a "with another sprint" item.
 
