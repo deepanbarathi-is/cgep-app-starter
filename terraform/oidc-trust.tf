@@ -5,10 +5,14 @@
 #   plan role   pull requests only, read-only, so a PR can be checked but cannot change AWS
 #   apply role  merges to main only, can change what this project manages
 #
-# The trust conditions use the token's exact "sub" claim, not a wildcard. GitHub documents
-# the formats as repo:OWNER/REPO:pull_request and repo:OWNER/REPO:ref:refs/heads/BRANCH.
+# The trust conditions use the token's exact "sub" claim, not a wildcard. Repositories
+# created after 15 July 2026 use GitHub's immutable subject format, which puts the numeric
+# owner and repository IDs in the claim: repo:OWNER@OWNER_ID/REPO@REPO_ID:pull_request and
+# repo:OWNER@OWNER_ID/REPO@REPO_ID:ref:refs/heads/BRANCH. This repository uses it, which
+# `gh api repos/OWNER/REPO/actions/oidc/customization/sub` confirms. The IDs also mean a
+# renamed or re-created repository under the same name cannot assume these roles.
 locals {
-  github_repo = "deepanbarathi-is/cgep-app-starter"
+  github_repo = "deepanbarathi-is@180098021/cgep-app-starter@1380980004"
   github_sub  = "token.actions.githubusercontent.com:sub"
   github_aud  = "token.actions.githubusercontent.com:aud"
 }
