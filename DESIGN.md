@@ -15,7 +15,7 @@ I'm choosing HIPAA Security Rule as my primary framework. Acme Health handles PH
 | GAP-03: no TLS-deny bucket policy | 164.312(e)(1) | Yes, new bucket policy | Yes | `s3-bucket-ssl-requests-only` | Direct fit: guards against unauthorized access during transmission |
 | GAP-04: no S3 versioning | 164.308(a)(7) | Yes, from the module | No dedicated policy | `s3-bucket-versioning-enabled` | Terraform and monitoring only, not one of my 5 flagship policies |
 | GAP-05: Lambda not in VPC | 164.312(e)(1) | Yes, `vpc_config` added to the Lambda, plus a private route table, Gateway Endpoints (S3 + DynamoDB), and a security group | Yes | `lambda-inside-vpc` | Same control family as GAP-03, different mechanism: path isolation, not channel encryption. I chose Gateway Endpoints over a NAT Gateway because they're free, keep PHI traffic off the public internet entirely, and have no per-AZ capacity ceiling |
-| GAP-06: no concurrency/DLQ/X-Ray | not HIPAA-mapped (SOC 2 CC7.2 / CMMC SI.L2-3.14.6 only) | Partial: reserved concurrency + X-Ray only | No | No | I'm skipping the DLQ piece deliberately: this Lambda is invoked synchronously via API Gateway, so a DLQ, which is designed for async failures, wouldn't capture anything under normal operation. I'm documenting this as an accepted gap rather than adding a non-functional checkbox |
+| GAP-06: no concurrency/DLQ/X-Ray | not HIPAA-mapped (SOC 2 CC7.2 / CMMC SI.L2-3.14.6 only) | Partial: X-Ray tracing only | No | No | I'm skipping the DLQ piece deliberately: this Lambda is invoked synchronously via API Gateway, so a DLQ, which is designed for async failures, wouldn't capture anything under normal operation. I'm documenting this as an accepted gap rather than adding a non-functional checkbox. Reserved concurrency is also not possible in this account: the total Lambda concurrency limit is 10, and AWS requires 100 to stay unreserved. API Gateway throttling (GAP-08) is the compensating control |
 | GAP-07: IAM `dynamodb:*`/`s3:*` | 164.312(a)(1) | Yes, scoped to specific actions, edited in place | Yes | none | Textbook least privilege. No Config rule can see this gap: the managed IAM rules skip inline policies, and the starter's policy is inline, so the Rego gate is my only detection here |
 | GAP-08: no API GW logging/throttling/WAF | 164.312(b), logging only | Logging + throttling yes; WAF likely stays undone | No dedicated policy | `api-gwv2-access-logs-enabled` | Throttling and WAF are availability and attack-surface concerns, not audit trail. Citing 164.312(b) for those would repeat the same over-claim I caught on GAP-01 |
 
@@ -32,9 +32,11 @@ I'm using AWS Config with targeted managed rules instead of custom Lambda detect
 - `lambda-inside-vpc` for GAP-05
 - `api-gwv2-access-logs-enabled` for GAP-08
 
-Config also needs a configuration recorder and a delivery channel, which I'll define alongside the rules.
+Config also needs a configuration recorder, a delivery channel, and somewhere to write its records. I gave it its own bucket, hardened by the same module as the other buckets, and its own IAM role that can only write under the Config prefix of that bucket and use that bucket's key. The recorder watches only the four resource types the six rules look at (S3 buckets, DynamoDB tables, Lambda functions, and API Gateway stages), which keeps the per-item charge small. The rules are detective controls. They tell me when something drifts, and the Rego policies in Layer 2 are the preventive side.
 
-For alert routing, an EventBridge rule on Config's compliance-change events feeds an SNS topic. This gives real alert routing without building a full notification system.
+Config evaluates every S3 bucket in the account, not just the workload's, so it flagged the evidence vault I built in Lab 2.5 as non-compliant on the KMS and TLS rules. That bucket uses SSE-S3 and has no TLS-deny policy, which is what those two rules exist to catch. I'm leaving it alone and treating the finding as proof that the monitoring works on real data.
+
+For alert routing, an EventBridge rule on Config's compliance-change events feeds an SNS topic. This gives real alert routing without building a full notification system. The topic is encrypted with its own KMS key, because the AWS-managed SNS key does not let EventBridge publish to it and alerts would silently never arrive. The email subscription is optional: the `alert_email` variable defaults to an empty string, so anyone can plan and apply the code without giving an address, and the topic and rule still exist. I keep my own address in a gitignored `terraform.tfvars`.
 
 For detection test coverage, `scripts/verify-controls.sh` deliberately reintroduces one gap (for example, removing the versioning setting through the CLI), polls AWS Config for a `NON_COMPLIANT` result, then reverts the change. This proves the control actually fires instead of just assuming it does.
 
@@ -51,11 +53,14 @@ terraform/
 ├── kms.tf                   # dedicated CMK for the DynamoDB table (GAP-02)
 ├── s3-hardening.tf          # module call for the uploads bucket, TLS-deny bucket policy (GAP-03)
 ├── network.tf               # private route table, Gateway Endpoints, Lambda security group (GAP-05)
-├── evidence-vault.tf
-├── cloudtrail.tf
-├── oidc-trust.tf
-└── monitoring.tf            # Config recorder, rules, SNS, EventBridge
+├── api-logging.tf           # access log group for the API (GAP-08)
+├── evidence-vault.tf        # Object Lock vault, GOVERNANCE, 30 days, hardened by the module
+├── cloudtrail.tf            # multi-region trail with log-file validation, its own key and log bucket (164.312(b))
+├── oidc-trust.tf            # planned for Layer 3
+└── monitoring.tf            # Config recorder, rules, SNS, EventBridge (164.312(b))
 ```
+
+The module also hardens the Config bucket, so it is called three times: uploads, evidence, and Config. The CloudTrail log bucket is the one bucket that does not use it. CloudTrail delivers as a service principal, and the module's key policy only trusts my own account, so the trail gets a dedicated key whose policy names CloudTrail and this one trail. The bucket still uses KMS, so the GAP-01 policy holds for every bucket in the account.
 
 Some gaps can be closed with new resources placed next to the starter's, which is the case for GAP-01, 03, and 04. Others live inside a starter resource as an inline block (GAP-02's `server_side_encryption`, GAP-05's `vpc_config`, GAP-06's concurrency and tracing, GAP-08's access logging) or replace an existing policy (GAP-07). Defining the same resource a second time in another file would be an error, and the starter's own comments say the learner is expected to add these in place. So I'm editing `main.tf` directly and marking each change with its GAP comment.
 
@@ -83,25 +88,29 @@ I also add cross-references to SOC 2 and CMMC controls in `props` on the relevan
 
 ## Decisions and trade-offs
 
-- **Region:** us-east-1, matching the starter's default. The scenario states no data-residency requirement.
-- **Object Lock mode:** GOVERNANCE on the evidence vault. COMPLIANCE is the stronger tamper-resistance claim because nobody, including root, can delete evidence before retention expires, but it also means I cannot clean up a mistake. GOVERNANCE lets a principal with `s3:BypassGovernanceRetention` override the lock, which I accept for a short-lived, single-developer project. For production I would use COMPLIANCE.
-- **Object Lock retention:** 30 days on the evidence vault. Reviews take 5 to 7 business days and the reviewer checks that retention is still active, so a short retention such as 1 day would have expired by then. I'll re-run the pipeline shortly before submitting so a fresh bundle exists.
-- **Apply on merge:** the pipeline applies automatically on merge to main, after the policy gate passes. This is fully continuous, but it gives the pipeline real deploy power, so I'm limiting the risk with branch protection, a required status check, and an OIDC role scoped to this repository.
-- **Account model:** one AWS account, my sandbox. For production the evidence vault would live in a separate account, so a compromise of the audited account could not quietly rewrite the evidence.
-- **Terraform versus policy:** I close each gap in Terraform and use Rego to stop it coming back.
-- **Write-up:** about five pages, built from this doc, with a control-to-code coverage table and an honest list of what I didn't get to.
+- I'm using us-east-1, matching the starter's default. The scenario states no data-residency requirement.
+- The evidence vault uses Object Lock in GOVERNANCE mode. COMPLIANCE is the stronger tamper-resistance claim because nobody, including root, can delete evidence before retention expires, but it also means I cannot clean up a mistake. GOVERNANCE lets a principal with `s3:BypassGovernanceRetention` override the lock, which I accept for a short-lived, single-developer project. For production I would use COMPLIANCE.
+- Retention on the vault is 30 days. Reviews take 5 to 7 business days and the reviewer checks that retention is still active, so a short retention such as 1 day would have expired by then. I'll re-run the pipeline shortly before submitting so a fresh bundle exists.
+- The pipeline applies automatically on merge to main, after the policy gate passes. This is fully continuous, but it gives the pipeline real deploy power, so I'm limiting the risk with branch protection, a required status check, and an OIDC role scoped to this repository.
+- Everything runs in one AWS account, my sandbox. For production the evidence vault would live in a separate account, so a compromise of the audited account could not quietly rewrite the evidence.
+- I close each gap in Terraform and use Rego to stop it coming back.
+- The capstone overview says the capstone vault is Lab 2.5's vault. I read that as the same design, not the same bucket: the Layer 1 list asks for a KMS-encrypted vault defined in this repo's Terraform, and my Lab 2.5 bucket lives in another repo and uses SSE-S3. So I rebuilt the vault here from the lab's pattern and left the old bucket alone. It holds the signed bundles from Lab 4.4, so I'm keeping it until the capstone pipeline has uploaded and verified a bundle in the new vault. Then I'll remove it, after checking that my labs repo holds its own copy of that evidence. It has no `force_destroy`, so every object version has to be emptied first.
+- I'm assuming graders will not have access to my AWS account, and the vault is private, so verification cannot depend on downloading from it. The pipeline uploads the signed bundle to the vault and records the Object Lock retention it saw (mode, retain-until date, and version ID) in `receipt.json`. I commit one signed sample bundle, its SHA-256, and that receipt in a tracked folder, because the starter's `.gitignore` ignores `evidence/`. The README gives a SHA check and a `cosign verify-blob` command that needs only the bundle and the public Rekor log. `verify-evidence.sh` checks live retention when the reader has credentials and falls back to the receipt when they do not. I can't be sure how the graders check retention, so I'll say that in the write-up.
+- I applied the Layer 1 baseline once by hand from the feature branch, in small chunks, testing each before the next: the workload gaps first, then the vault, then CloudTrail, then monitoring. The brief says not to start the pipeline until the baseline applies clean, and small chunks meant a failure pointed at a few resources instead of forty.
+- The write-up will run about five pages, built from this doc, with a control-to-code coverage table and an honest list of what I didn't get to.
 
 ## Engineering hygiene decisions
 
 - I added a LICENSE file (MIT), matching what the starter's README already claims but never actually shipped.
 - I'm committing `.terraform.lock.hcl` for this project so dependencies stay pinned, since that's explicitly called out in the grading rubric.
-- For state management, I'm using local Terraform state deliberately, documenting it as a single-developer, short-timeline trade-off rather than standing up a remote S3 and DynamoDB backend just to satisfy that one rubric line.
+- State lives in an S3 backend that uses S3's native lockfile (`use_lockfile`) for locking. Local state would work for one person, but the pipeline applies on merge from a runner that is thrown away after every run. That runner would not know what already exists, and its second run would collide with the first: my trail name is fixed, and AWS allows only one Config recorder per region. `use_lockfile` needs Terraform 1.10 or newer, so I'll raise `required_version` from 1.6, and I'm not building a DynamoDB lock table. I'll create the state bucket with the same module as my other buckets and migrate the local state up once with `terraform init -migrate-state` when I build Layer 3.
+- The rubric lists automatic fails for a private repo, secrets or PII in the repo, and a missing README. The repo is public, my alert address sits in a gitignored `terraform.tfvars`, and I'll run gitleaks and write the short grader README before I submit.
 
 ## CI/CD pipeline, expanded stages, still one workflow
 
 `lint → validate → security scan (checkov + tfsec) → gitleaks → policy check (Conftest) → apply → sign (Cosign) → upload (vault)`
 
-This is wider than the bare 5 steps described in the brief, matching what the rubric explicitly checks for in CI. It runs on pull requests against main. I'll wire branch protection (require a PR, no bypass, a required status check) once this workflow exists and I have a real job name to point it at.
+This is wider than the bare 5 steps described in the brief, matching what the rubric explicitly checks for in CI. It runs on pull requests against main, and I keep the plan JSON and the signed bundle as workflow artifacts, since the rubric's top tier asks for artifacts to be preserved. I'll wire branch protection (require a PR, no bypass, a required status check) once this workflow exists and I have a real job name to point it at.
 
 The repo history will show two pull requests: one green PR that merges, and one red PR that deliberately reintroduces a gap and is blocked by the gate. I'll choose which gap when I build the pipeline.
 
@@ -115,18 +124,21 @@ The repo history will show two pull requests: one green PR that merges, and one 
 
 `terraform fmt -check`, `tflint`, `checkov`, `gitleaks`, `semgrep --config=auto`, and `opa test ./policies`, fixing anything HIGH or CRITICAL. I'm treating this as insurance rather than the main scoring lever: end-to-end integration and clear reasoning matter more, but this is cheap to run and catches real problems before submission.
 
-## What I'm deliberately not doing, honest and stated
+## What I'm deliberately not doing
 
 - GAP-06's DLQ, since synchronous invocation makes it non-functional here.
+- GAP-06's reserved concurrency, since this account's Lambda concurrency limit of 10 leaves nothing to reserve (AWS requires 100 to stay unreserved). API Gateway throttling is the compensating control.
 - GAP-08's WAF, since the ongoing cost and complexity isn't worth the added scope for this timeline.
 - A Config rule for GAP-07, since AWS's managed IAM rules don't evaluate inline policies.
-- A remote Terraform state backend: a documented choice, not something I built.
+- CloudTrail data events for S3 and DynamoDB. They would record every object and item access, which is closer to what an auditor wants for PHI, but they are billed per event and the trail's management events already cover who changed what.
+- Recording every Config resource type. I record only the four the rules use.
+- A DynamoDB table for state locking, since S3's native lockfile does the same job for a single developer.
 - Automated retry and dead-letter handling on the evidence pipeline itself, which I'm noting as a "with another sprint" item.
 
 ## Open decisions
 
-- **OSCAL catalog for HIPAA.** NIST publishes OSCAL catalogs for SP 800-53 and SP 800-171, but none for HIPAA or SP 800-66 (I checked the usnistgov/oscal-content repository). The starter's FRAMEWORKS.md suggests citing SP 800-66 Rev. 2 as the catalog and putting the 164.x sections in `props`. I haven't decided how the component's `control-implementation.source` and the profile will point at it, and I'll settle that before building this layer.
-- **Pass threshold.** The live rubric gives it as 65 in its header and 80 in its body, and the Capstone Overview PDF (also v1.1.0) says 65. I'm designing to the stricter 80 until that's settled.
+- The OSCAL catalog for HIPAA is still open. NIST publishes OSCAL catalogs for SP 800-53 and SP 800-171, but none for HIPAA or SP 800-66 (I checked the usnistgov/oscal-content repository). The starter's FRAMEWORKS.md suggests citing SP 800-66 Rev. 2 as the catalog and putting the 164.x sections in `props`. I haven't decided how the component's `control-implementation.source` and the profile will point at it, and I'll settle that before building this layer.
+- The pass threshold is also unsettled. The live rubric gives it as 65 in its header and 80 in its body, and the Capstone Overview PDF (also v1.1.0) says 65. I'm designing to the stricter 80 until that's clear.
 
 ## Requirements sources and how I ranked them
 
