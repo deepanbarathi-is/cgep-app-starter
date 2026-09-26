@@ -54,6 +54,16 @@ conftest test plan.json --policy policies --all-namespaces
 
 `--all-namespaces` runs every policy at once, which is how the pipeline calls them. To run one, use `--namespace compliance.hipaa.s3_kms`, for example.
 
+## Break tests
+
+The unit tests in `tests/` feed each policy hand-built input. `test/policy-breaks.sh` tests the whole gate against a plan shaped like a real one. It takes a saved plan that passes, breaks it in one specific way per case with `jq`, and checks that Conftest rejects each broken plan and names the right gap and resource. It also checks that the untouched plan still passes, so a gate that rejected everything could not get through.
+
+```
+test/policy-breaks.sh
+```
+
+There are seven cases: a Lambda outside the VPC, a DynamoDB table on the default key, an S3 bucket on SSE-S3, an S3 bucket with no encryption configuration, a wildcard IAM action, a TLS condition turned off, and a TLS-deny policy removed from the code. The plan it uses is `test/fixtures/plan-baseline.json`. It comes from my real baseline plan, trimmed to the six resource types the policies read, with my AWS account ID replaced by `111122223333`, so it runs anywhere with `opa` and `conftest` and needs no AWS credentials.
+
 ## What they do not cover
 
 - They only see what goes through Terraform. A bucket someone creates by hand in the console never appears in a plan, so these policies cannot stop it. The AWS Config rules in `terraform/monitoring.tf` are the detective control for that case.
