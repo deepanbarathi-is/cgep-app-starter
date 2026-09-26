@@ -70,15 +70,17 @@ The module also declares an explicit public access block on every bucket it hard
 
 ## Policy suite (Layer 2)
 
-Five Rego policies, one per flagship gap, each in its own file and each scoped to a single resource type:
+Five Rego policies, one per flagship gap, each in its own file under `policies/`:
 
-- GAP-01: every S3 bucket encryption configuration must use `aws:kms`
-- GAP-02: every DynamoDB table must set `server_side_encryption` with a KMS key
-- GAP-03: every S3 bucket holding PHI must have a bucket policy that denies requests where `aws:SecureTransport` is false
+- GAP-01: every S3 bucket must have default encryption that uses `aws:kms` with a customer-managed key
+- GAP-02: every DynamoDB table must set `server_side_encryption` with a customer-managed KMS key
+- GAP-03: every S3 bucket must have a bucket policy that denies requests where `aws:SecureTransport` is false, covering the bucket and its objects
 - GAP-05: every Lambda function must have a `vpc_config`
-- GAP-07: no IAM role policy may allow a service-wide wildcard action such as `s3:*`
+- GAP-07: no identity policy may allow `*` or a service-wide wildcard action such as `s3:*`
 
-Each policy carries a `# METADATA` block naming the framework (`hipaa`), the HIPAA control IDs, a severity, and a remediation. The deny message includes the control ID, so a developer reading a failed PR sees the exact citation. Each policy has its own `_test.rego` with passing and failing fixtures, and the rules are deny-by-default. Conftest runs them against the Terraform plan JSON in the pipeline.
+Each policy carries a `# METADATA` block naming the framework (`hipaa`), the HIPAA control ID, a severity, the gap, and a remediation. The deny message includes the control ID, so a developer reading a failed PR sees the exact citation. Each policy has its own `_test.rego` with passing and failing cases, 53 in total.
+
+The policies read `resource_changes`, the flat list of every resource in the plan, because my S3 hardening lives inside a module and a policy that only read the root module would miss it. They fail closed: a missing block or an unreadable policy is denied, not assumed safe. Resources that a plan is deleting are ignored. Three of them needed a second way to work when a value is not known until apply (the GAP-01 policy counts new buckets against new encryption configurations, the GAP-03 policy follows the code from bucket to policy to policy document, and the GAP-07 policy denies policy text it cannot read). `policies/README.md` lists what each policy does not cover, including the fact that a resource created outside Terraform never appears in a plan, which is why the Config rules exist. Conftest runs the suite against the Terraform plan JSON in the pipeline.
 
 ## OSCAL component (Layer 4)
 
@@ -117,6 +119,7 @@ The repo history will show two pull requests: one green PR that merges, and one 
 ## Testing strategy
 
 - Rego `_test.rego` fixtures with positive and negative cases, one set per flagship policy.
+- `test/policy-breaks.sh`: an integration test for the whole gate. It takes a real baseline plan that passes, breaks it in seven specific ways with `jq`, and requires Conftest to reject each one with the right gap and resource. It also requires the untouched plan to pass, so a gate that rejects everything cannot slip through.
 - `scripts/verify-controls.sh`: integration-level runtime checks against real deployed resources (a non-TLS S3 request that expects `AccessDenied`, confirming the real IAM role has no wildcard actions, confirming the real KMS key is attached to S3 and DynamoDB).
 - `scripts/verify-evidence.sh`: chain-of-custody verification on the signed bundle (integrity, authenticity, and retention checks).
 
