@@ -1,0 +1,2902 @@
+{
+  "format_version": "1.2",
+  "terraform_version": "1.16.1",
+  "resource_changes": [
+    {
+      "address": "aws_dynamodb_table.intake",
+      "mode": "managed",
+      "type": "aws_dynamodb_table",
+      "name": "intake",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "before": {
+          "arn": "arn:aws:dynamodb:us-east-1:111122223333:table/acme-health-intake-submissions-5c657426",
+          "attribute": [
+            {
+              "name": "submission_id",
+              "type": "S"
+            }
+          ],
+          "billing_mode": "PAY_PER_REQUEST",
+          "deletion_protection_enabled": false,
+          "global_secondary_index": [],
+          "hash_key": "submission_id",
+          "id": "acme-health-intake-submissions-5c657426",
+          "import_table": [],
+          "local_secondary_index": [],
+          "name": "acme-health-intake-submissions-5c657426",
+          "on_demand_throughput": [],
+          "point_in_time_recovery": [
+            {
+              "enabled": false,
+              "recovery_period_in_days": 0
+            }
+          ],
+          "range_key": null,
+          "read_capacity": 0,
+          "replica": [],
+          "restore_date_time": null,
+          "restore_source_name": null,
+          "restore_source_table_arn": null,
+          "restore_to_latest_time": null,
+          "server_side_encryption": [
+            {
+              "enabled": true,
+              "kms_key_arn": "arn:aws:kms:us-east-1:111122223333:key/de46b213-412f-4713-82a6-23e144ba132f"
+            }
+          ],
+          "stream_arn": "",
+          "stream_enabled": false,
+          "stream_label": "",
+          "stream_view_type": "",
+          "table_class": "STANDARD",
+          "tags": {},
+          "tags_all": {
+            "DataClass": "phi",
+            "ManagedBy": "terraform",
+            "Project": "acme-health-intake",
+            "Workload": "patient-intake-api"
+          },
+          "timeouts": null,
+          "ttl": [
+            {
+              "attribute_name": "",
+              "enabled": false
+            }
+          ],
+          "write_capacity": 0
+        },
+        "after": {
+          "arn": "arn:aws:dynamodb:us-east-1:111122223333:table/acme-health-intake-submissions-5c657426",
+          "attribute": [
+            {
+              "name": "submission_id",
+              "type": "S"
+            }
+          ],
+          "billing_mode": "PAY_PER_REQUEST",
+          "deletion_protection_enabled": false,
+          "global_secondary_index": [],
+          "hash_key": "submission_id",
+          "id": "acme-health-intake-submissions-5c657426",
+          "import_table": [],
+          "local_secondary_index": [],
+          "name": "acme-health-intake-submissions-5c657426",
+          "on_demand_throughput": [],
+          "point_in_time_recovery": [
+            {
+              "enabled": false,
+              "recovery_period_in_days": 0
+            }
+          ],
+          "range_key": null,
+          "read_capacity": 0,
+          "replica": [],
+          "restore_date_time": null,
+          "restore_source_name": null,
+          "restore_source_table_arn": null,
+          "restore_to_latest_time": null,
+          "server_side_encryption": [
+            {
+              "enabled": true,
+              "kms_key_arn": "arn:aws:kms:us-east-1:111122223333:key/de46b213-412f-4713-82a6-23e144ba132f"
+            }
+          ],
+          "stream_arn": "",
+          "stream_enabled": false,
+          "stream_label": "",
+          "stream_view_type": "",
+          "table_class": "STANDARD",
+          "tags": {},
+          "tags_all": {
+            "DataClass": "phi",
+            "ManagedBy": "terraform",
+            "Project": "acme-health-intake",
+            "Workload": "patient-intake-api"
+          },
+          "timeouts": null,
+          "ttl": [
+            {
+              "attribute_name": "",
+              "enabled": false
+            }
+          ],
+          "write_capacity": 0
+        },
+        "after_unknown": {},
+        "before_sensitive": {
+          "attribute": [
+            {}
+          ],
+          "global_secondary_index": [],
+          "import_table": [],
+          "local_secondary_index": [],
+          "on_demand_throughput": [],
+          "point_in_time_recovery": [
+            {}
+          ],
+          "replica": [],
+          "server_side_encryption": [
+            {}
+          ],
+          "tags": {},
+          "tags_all": {},
+          "ttl": [
+            {}
+          ]
+        },
+        "after_sensitive": {
+          "attribute": [
+            {}
+          ],
+          "global_secondary_index": [],
+          "import_table": [],
+          "local_secondary_index": [],
+          "on_demand_throughput": [],
+          "point_in_time_recovery": [
+            {}
+          ],
+          "replica": [],
+          "server_side_encryption": [
+            {}
+          ],
+          "tags": {},
+          "tags_all": {},
+          "ttl": [
+            {}
+          ]
+        }
+      }
+    },
+    {
+      "address": "aws_iam_role_policy.config_delivery",
+      "mode": "managed",
+      "type": "aws_iam_role_policy",
+      "name": "config_delivery",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "before": {
+          "id": "acme-health-intake-config-5c657426:config-delivery",
+          "name": "config-delivery",
+          "name_prefix": "",
+          "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":\"s3:GetBucketAcl\",\"Effect\":\"Allow\",\"Resource\":\"arn:aws:s3:::acme-health-intake-config-5c657426\",\"Sid\":\"ReadBucketAcl\"},{\"Action\":\"s3:PutObject\",\"Condition\":{\"StringEquals\":{\"s3:x-amz-acl\":\"bucket-owner-full-control\"}},\"Effect\":\"Allow\",\"Resource\":\"arn:aws:s3:::acme-health-intake-config-5c657426/AWSLogs/111122223333/Config/*\",\"Sid\":\"WriteConfigRecords\"},{\"Action\":[\"kms:GenerateDataKey\",\"kms:Decrypt\"],\"Effect\":\"Allow\",\"Resource\":\"arn:aws:kms:us-east-1:111122223333:key/15592021-c3eb-4ec0-940a-3c2c9e79baa4\",\"Sid\":\"UseBucketKey\"}]}",
+          "role": "acme-health-intake-config-5c657426"
+        },
+        "after": {
+          "id": "acme-health-intake-config-5c657426:config-delivery",
+          "name": "config-delivery",
+          "name_prefix": "",
+          "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":\"s3:GetBucketAcl\",\"Effect\":\"Allow\",\"Resource\":\"arn:aws:s3:::acme-health-intake-config-5c657426\",\"Sid\":\"ReadBucketAcl\"},{\"Action\":\"s3:PutObject\",\"Condition\":{\"StringEquals\":{\"s3:x-amz-acl\":\"bucket-owner-full-control\"}},\"Effect\":\"Allow\",\"Resource\":\"arn:aws:s3:::acme-health-intake-config-5c657426/AWSLogs/111122223333/Config/*\",\"Sid\":\"WriteConfigRecords\"},{\"Action\":[\"kms:GenerateDataKey\",\"kms:Decrypt\"],\"Effect\":\"Allow\",\"Resource\":\"arn:aws:kms:us-east-1:111122223333:key/15592021-c3eb-4ec0-940a-3c2c9e79baa4\",\"Sid\":\"UseBucketKey\"}]}",
+          "role": "acme-health-intake-config-5c657426"
+        },
+        "after_unknown": {},
+        "before_sensitive": {},
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_iam_role_policy.lambda_inline",
+      "mode": "managed",
+      "type": "aws_iam_role_policy",
+      "name": "lambda_inline",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "before": {
+          "id": "acme-health-intake-lambda-5c657426:intake-data-access",
+          "name": "intake-data-access",
+          "name_prefix": "",
+          "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":\"dynamodb:PutItem\",\"Effect\":\"Allow\",\"Resource\":\"arn:aws:dynamodb:us-east-1:111122223333:table/acme-health-intake-submissions-5c657426\",\"Sid\":\"WriteSubmissions\"},{\"Action\":\"s3:PutObject\",\"Effect\":\"Allow\",\"Resource\":\"arn:aws:s3:::acme-health-intake-uploads-5c657426/uploads/*\",\"Sid\":\"WriteAttachments\"},{\"Action\":[\"kms:GenerateDataKey\",\"kms:Decrypt\"],\"Effect\":\"Allow\",\"Resource\":[\"arn:aws:kms:us-east-1:111122223333:key/de46b213-412f-4713-82a6-23e144ba132f\",\"arn:aws:kms:us-east-1:111122223333:key/392fb7fb-957b-494a-be2b-20bdfeb87852\"],\"Sid\":\"UseDataKeys\"},{\"Action\":[\"xray:PutTraceSegments\",\"xray:PutTelemetryRecords\"],\"Effect\":\"Allow\",\"Resource\":\"*\",\"Sid\":\"SendTraces\"}]}",
+          "role": "acme-health-intake-lambda-5c657426"
+        },
+        "after": {
+          "id": "acme-health-intake-lambda-5c657426:intake-data-access",
+          "name": "intake-data-access",
+          "name_prefix": "",
+          "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":\"dynamodb:PutItem\",\"Effect\":\"Allow\",\"Resource\":\"arn:aws:dynamodb:us-east-1:111122223333:table/acme-health-intake-submissions-5c657426\",\"Sid\":\"WriteSubmissions\"},{\"Action\":\"s3:PutObject\",\"Effect\":\"Allow\",\"Resource\":\"arn:aws:s3:::acme-health-intake-uploads-5c657426/uploads/*\",\"Sid\":\"WriteAttachments\"},{\"Action\":[\"kms:GenerateDataKey\",\"kms:Decrypt\"],\"Effect\":\"Allow\",\"Resource\":[\"arn:aws:kms:us-east-1:111122223333:key/de46b213-412f-4713-82a6-23e144ba132f\",\"arn:aws:kms:us-east-1:111122223333:key/392fb7fb-957b-494a-be2b-20bdfeb87852\"],\"Sid\":\"UseDataKeys\"},{\"Action\":[\"xray:PutTraceSegments\",\"xray:PutTelemetryRecords\"],\"Effect\":\"Allow\",\"Resource\":\"*\",\"Sid\":\"SendTraces\"}]}",
+          "role": "acme-health-intake-lambda-5c657426"
+        },
+        "after_unknown": {},
+        "before_sensitive": {},
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_lambda_function.intake",
+      "mode": "managed",
+      "type": "aws_lambda_function",
+      "name": "intake",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "before": {
+          "architectures": [
+            "x86_64"
+          ],
+          "arn": "arn:aws:lambda:us-east-1:111122223333:function:acme-health-intake-handler-5c657426",
+          "code_sha256": "Kiy8cgnKKNjWRcOwyYAQxn5K70qMuNfnsitGkkP5oIs=",
+          "code_signing_config_arn": "",
+          "dead_letter_config": [],
+          "description": "",
+          "environment": [
+            {
+              "variables": {
+                "INTAKE_TABLE": "acme-health-intake-submissions-5c657426",
+                "UPLOAD_BUCKET": "acme-health-intake-uploads-5c657426"
+              }
+            }
+          ],
+          "ephemeral_storage": [
+            {
+              "size": 512
+            }
+          ],
+          "file_system_config": [],
+          "filename": "./lambda/handler.zip",
+          "function_name": "acme-health-intake-handler-5c657426",
+          "handler": "handler.handler",
+          "id": "acme-health-intake-handler-5c657426",
+          "image_config": [],
+          "image_uri": "",
+          "invoke_arn": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:111122223333:function:acme-health-intake-handler-5c657426/invocations",
+          "kms_key_arn": "",
+          "last_modified": "2026-09-25T13:58:11.000+0000",
+          "layers": [],
+          "logging_config": [
+            {
+              "application_log_level": "",
+              "log_format": "Text",
+              "log_group": "/aws/lambda/acme-health-intake-handler-5c657426",
+              "system_log_level": ""
+            }
+          ],
+          "memory_size": 128,
+          "package_type": "Zip",
+          "publish": false,
+          "qualified_arn": "arn:aws:lambda:us-east-1:111122223333:function:acme-health-intake-handler-5c657426:$LATEST",
+          "qualified_invoke_arn": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:111122223333:function:acme-health-intake-handler-5c657426:$LATEST/invocations",
+          "replace_security_groups_on_destroy": null,
+          "replacement_security_group_ids": null,
+          "reserved_concurrent_executions": -1,
+          "role": "arn:aws:iam::111122223333:role/acme-health-intake-lambda-5c657426",
+          "runtime": "python3.12",
+          "s3_bucket": null,
+          "s3_key": null,
+          "s3_object_version": null,
+          "signing_job_arn": "",
+          "signing_profile_version_arn": "",
+          "skip_destroy": false,
+          "snap_start": [],
+          "source_code_hash": "Kiy8cgnKKNjWRcOwyYAQxn5K70qMuNfnsitGkkP5oIs=",
+          "source_code_size": 861,
+          "tags": {},
+          "tags_all": {
+            "DataClass": "phi",
+            "ManagedBy": "terraform",
+            "Project": "acme-health-intake",
+            "Workload": "patient-intake-api"
+          },
+          "timeout": 10,
+          "timeouts": null,
+          "tracing_config": [
+            {
+              "mode": "Active"
+            }
+          ],
+          "version": "$LATEST",
+          "vpc_config": [
+            {
+              "ipv6_allowed_for_dual_stack": false,
+              "security_group_ids": [
+                "sg-0f6a4d196c071815b"
+              ],
+              "subnet_ids": [
+                "subnet-076dcd8f13a4ec466",
+                "subnet-0fd540f5eb9e2c6dc"
+              ],
+              "vpc_id": "vpc-069c068dff2e7c038"
+            }
+          ]
+        },
+        "after": {
+          "architectures": [
+            "x86_64"
+          ],
+          "arn": "arn:aws:lambda:us-east-1:111122223333:function:acme-health-intake-handler-5c657426",
+          "code_sha256": "Kiy8cgnKKNjWRcOwyYAQxn5K70qMuNfnsitGkkP5oIs=",
+          "code_signing_config_arn": "",
+          "dead_letter_config": [],
+          "description": "",
+          "environment": [
+            {
+              "variables": {
+                "INTAKE_TABLE": "acme-health-intake-submissions-5c657426",
+                "UPLOAD_BUCKET": "acme-health-intake-uploads-5c657426"
+              }
+            }
+          ],
+          "ephemeral_storage": [
+            {
+              "size": 512
+            }
+          ],
+          "file_system_config": [],
+          "filename": "./lambda/handler.zip",
+          "function_name": "acme-health-intake-handler-5c657426",
+          "handler": "handler.handler",
+          "id": "acme-health-intake-handler-5c657426",
+          "image_config": [],
+          "image_uri": "",
+          "invoke_arn": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:111122223333:function:acme-health-intake-handler-5c657426/invocations",
+          "kms_key_arn": "",
+          "last_modified": "2026-09-25T13:58:11.000+0000",
+          "layers": [],
+          "logging_config": [
+            {
+              "application_log_level": "",
+              "log_format": "Text",
+              "log_group": "/aws/lambda/acme-health-intake-handler-5c657426",
+              "system_log_level": ""
+            }
+          ],
+          "memory_size": 128,
+          "package_type": "Zip",
+          "publish": false,
+          "qualified_arn": "arn:aws:lambda:us-east-1:111122223333:function:acme-health-intake-handler-5c657426:$LATEST",
+          "qualified_invoke_arn": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:111122223333:function:acme-health-intake-handler-5c657426:$LATEST/invocations",
+          "replace_security_groups_on_destroy": null,
+          "replacement_security_group_ids": null,
+          "reserved_concurrent_executions": -1,
+          "role": "arn:aws:iam::111122223333:role/acme-health-intake-lambda-5c657426",
+          "runtime": "python3.12",
+          "s3_bucket": null,
+          "s3_key": null,
+          "s3_object_version": null,
+          "signing_job_arn": "",
+          "signing_profile_version_arn": "",
+          "skip_destroy": false,
+          "snap_start": [],
+          "source_code_hash": "Kiy8cgnKKNjWRcOwyYAQxn5K70qMuNfnsitGkkP5oIs=",
+          "source_code_size": 861,
+          "tags": {},
+          "tags_all": {
+            "DataClass": "phi",
+            "ManagedBy": "terraform",
+            "Project": "acme-health-intake",
+            "Workload": "patient-intake-api"
+          },
+          "timeout": 10,
+          "timeouts": null,
+          "tracing_config": [
+            {
+              "mode": "Active"
+            }
+          ],
+          "version": "$LATEST",
+          "vpc_config": [
+            {
+              "ipv6_allowed_for_dual_stack": false,
+              "security_group_ids": [
+                "sg-0f6a4d196c071815b"
+              ],
+              "subnet_ids": [
+                "subnet-076dcd8f13a4ec466",
+                "subnet-0fd540f5eb9e2c6dc"
+              ],
+              "vpc_id": "vpc-069c068dff2e7c038"
+            }
+          ]
+        },
+        "after_unknown": {},
+        "before_sensitive": {
+          "architectures": [
+            false
+          ],
+          "dead_letter_config": [],
+          "environment": [
+            {
+              "variables": {}
+            }
+          ],
+          "ephemeral_storage": [
+            {}
+          ],
+          "file_system_config": [],
+          "image_config": [],
+          "layers": [],
+          "logging_config": [
+            {}
+          ],
+          "snap_start": [],
+          "tags": {},
+          "tags_all": {},
+          "tracing_config": [
+            {}
+          ],
+          "vpc_config": [
+            {
+              "security_group_ids": [
+                false
+              ],
+              "subnet_ids": [
+                false,
+                false
+              ]
+            }
+          ]
+        },
+        "after_sensitive": {
+          "architectures": [
+            false
+          ],
+          "dead_letter_config": [],
+          "environment": [
+            {
+              "variables": {}
+            }
+          ],
+          "ephemeral_storage": [
+            {}
+          ],
+          "file_system_config": [],
+          "image_config": [],
+          "layers": [],
+          "logging_config": [
+            {}
+          ],
+          "snap_start": [],
+          "tags": {},
+          "tags_all": {},
+          "tracing_config": [
+            {}
+          ],
+          "vpc_config": [
+            {
+              "security_group_ids": [
+                false
+              ],
+              "subnet_ids": [
+                false,
+                false
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "address": "aws_s3_bucket.config",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "config",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "before": {
+          "acceleration_status": "",
+          "acl": null,
+          "arn": "arn:aws:s3:::acme-health-intake-config-5c657426",
+          "bucket": "acme-health-intake-config-5c657426",
+          "bucket_domain_name": "acme-health-intake-config-5c657426.s3.amazonaws.com",
+          "bucket_prefix": "",
+          "bucket_regional_domain_name": "acme-health-intake-config-5c657426.s3.us-east-1.amazonaws.com",
+          "cors_rule": [],
+          "force_destroy": false,
+          "grant": [
+            {
+              "id": "19b5bdeead60b342720812ced962877040b97038919278f9ef64cd7526c54cda",
+              "permissions": [
+                "FULL_CONTROL"
+              ],
+              "type": "CanonicalUser",
+              "uri": ""
+            }
+          ],
+          "hosted_zone_id": "Z3AQBSTGFYJSTF",
+          "id": "acme-health-intake-config-5c657426",
+          "lifecycle_rule": [],
+          "logging": [],
+          "object_lock_configuration": [],
+          "object_lock_enabled": false,
+          "policy": "{\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::acme-health-intake-config-5c657426/*\",\"arn:aws:s3:::acme-health-intake-config-5c657426\"],\"Sid\":\"DenyInsecureTransport\"}],\"Version\":\"2012-10-17\"}",
+          "region": "us-east-1",
+          "replication_configuration": [],
+          "request_payer": "BucketOwner",
+          "server_side_encryption_configuration": [
+            {
+              "rule": [
+                {
+                  "apply_server_side_encryption_by_default": [
+                    {
+                      "kms_master_key_id": "arn:aws:kms:us-east-1:111122223333:key/15592021-c3eb-4ec0-940a-3c2c9e79baa4",
+                      "sse_algorithm": "aws:kms"
+                    }
+                  ],
+                  "bucket_key_enabled": true
+                }
+              ]
+            }
+          ],
+          "tags": {},
+          "tags_all": {
+            "DataClass": "phi",
+            "ManagedBy": "terraform",
+            "Project": "acme-health-intake",
+            "Workload": "patient-intake-api"
+          },
+          "timeouts": null,
+          "versioning": [
+            {
+              "enabled": true,
+              "mfa_delete": false
+            }
+          ],
+          "website": [],
+          "website_domain": null,
+          "website_endpoint": null
+        },
+        "after": {
+          "acceleration_status": "",
+          "acl": null,
+          "arn": "arn:aws:s3:::acme-health-intake-config-5c657426",
+          "bucket": "acme-health-intake-config-5c657426",
+          "bucket_domain_name": "acme-health-intake-config-5c657426.s3.amazonaws.com",
+          "bucket_prefix": "",
+          "bucket_regional_domain_name": "acme-health-intake-config-5c657426.s3.us-east-1.amazonaws.com",
+          "cors_rule": [],
+          "force_destroy": false,
+          "grant": [
+            {
+              "id": "19b5bdeead60b342720812ced962877040b97038919278f9ef64cd7526c54cda",
+              "permissions": [
+                "FULL_CONTROL"
+              ],
+              "type": "CanonicalUser",
+              "uri": ""
+            }
+          ],
+          "hosted_zone_id": "Z3AQBSTGFYJSTF",
+          "id": "acme-health-intake-config-5c657426",
+          "lifecycle_rule": [],
+          "logging": [],
+          "object_lock_configuration": [],
+          "object_lock_enabled": false,
+          "policy": "{\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::acme-health-intake-config-5c657426/*\",\"arn:aws:s3:::acme-health-intake-config-5c657426\"],\"Sid\":\"DenyInsecureTransport\"}],\"Version\":\"2012-10-17\"}",
+          "region": "us-east-1",
+          "replication_configuration": [],
+          "request_payer": "BucketOwner",
+          "server_side_encryption_configuration": [
+            {
+              "rule": [
+                {
+                  "apply_server_side_encryption_by_default": [
+                    {
+                      "kms_master_key_id": "arn:aws:kms:us-east-1:111122223333:key/15592021-c3eb-4ec0-940a-3c2c9e79baa4",
+                      "sse_algorithm": "aws:kms"
+                    }
+                  ],
+                  "bucket_key_enabled": true
+                }
+              ]
+            }
+          ],
+          "tags": {},
+          "tags_all": {
+            "DataClass": "phi",
+            "ManagedBy": "terraform",
+            "Project": "acme-health-intake",
+            "Workload": "patient-intake-api"
+          },
+          "timeouts": null,
+          "versioning": [
+            {
+              "enabled": true,
+              "mfa_delete": false
+            }
+          ],
+          "website": [],
+          "website_domain": null,
+          "website_endpoint": null
+        },
+        "after_unknown": {},
+        "before_sensitive": {
+          "cors_rule": [],
+          "grant": [
+            {
+              "permissions": [
+                false
+              ]
+            }
+          ],
+          "lifecycle_rule": [],
+          "logging": [],
+          "object_lock_configuration": [],
+          "replication_configuration": [],
+          "server_side_encryption_configuration": [
+            {
+              "rule": [
+                {
+                  "apply_server_side_encryption_by_default": [
+                    {}
+                  ]
+                }
+              ]
+            }
+          ],
+          "tags": {},
+          "tags_all": {},
+          "versioning": [
+            {}
+          ],
+          "website": []
+        },
+        "after_sensitive": {
+          "cors_rule": [],
+          "grant": [
+            {
+              "permissions": [
+                false
+              ]
+            }
+          ],
+          "lifecycle_rule": [],
+          "logging": [],
+          "object_lock_configuration": [],
+          "replication_configuration": [],
+          "server_side_encryption_configuration": [
+            {
+              "rule": [
+                {
+                  "apply_server_side_encryption_by_default": [
+                    {}
+                  ]
+                }
+              ]
+            }
+          ],
+          "tags": {},
+          "tags_all": {},
+          "versioning": [
+            {}
+          ],
+          "website": []
+        }
+      }
+    },
+    {
+      "address": "aws_s3_bucket.evidence",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "evidence",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "before": {
+          "acceleration_status": "",
+          "acl": null,
+          "arn": "arn:aws:s3:::acme-health-intake-evidence-5c657426",
+          "bucket": "acme-health-intake-evidence-5c657426",
+          "bucket_domain_name": "acme-health-intake-evidence-5c657426.s3.amazonaws.com",
+          "bucket_prefix": "",
+          "bucket_regional_domain_name": "acme-health-intake-evidence-5c657426.s3.us-east-1.amazonaws.com",
+          "cors_rule": [],
+          "force_destroy": false,
+          "grant": [
+            {
+              "id": "19b5bdeead60b342720812ced962877040b97038919278f9ef64cd7526c54cda",
+              "permissions": [
+                "FULL_CONTROL"
+              ],
+              "type": "CanonicalUser",
+              "uri": ""
+            }
+          ],
+          "hosted_zone_id": "Z3AQBSTGFYJSTF",
+          "id": "acme-health-intake-evidence-5c657426",
+          "lifecycle_rule": [],
+          "logging": [],
+          "object_lock_configuration": [
+            {
+              "object_lock_enabled": "Enabled",
+              "rule": [
+                {
+                  "default_retention": [
+                    {
+                      "days": 30,
+                      "mode": "GOVERNANCE",
+                      "years": 0
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "object_lock_enabled": true,
+          "policy": "{\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::acme-health-intake-evidence-5c657426/*\",\"arn:aws:s3:::acme-health-intake-evidence-5c657426\"],\"Sid\":\"DenyInsecureTransport\"}],\"Version\":\"2012-10-17\"}",
+          "region": "us-east-1",
+          "replication_configuration": [],
+          "request_payer": "BucketOwner",
+          "server_side_encryption_configuration": [
+            {
+              "rule": [
+                {
+                  "apply_server_side_encryption_by_default": [
+                    {
+                      "kms_master_key_id": "arn:aws:kms:us-east-1:111122223333:key/57edca98-ce75-48d7-8e53-a38e1404e4b9",
+                      "sse_algorithm": "aws:kms"
+                    }
+                  ],
+                  "bucket_key_enabled": true
+                }
+              ]
+            }
+          ],
+          "tags": {},
+          "tags_all": {
+            "DataClass": "phi",
+            "ManagedBy": "terraform",
+            "Project": "acme-health-intake",
+            "Workload": "patient-intake-api"
+          },
+          "timeouts": null,
+          "versioning": [
+            {
+              "enabled": true,
+              "mfa_delete": false
+            }
+          ],
+          "website": [],
+          "website_domain": null,
+          "website_endpoint": null
+        },
+        "after": {
+          "acceleration_status": "",
+          "acl": null,
+          "arn": "arn:aws:s3:::acme-health-intake-evidence-5c657426",
+          "bucket": "acme-health-intake-evidence-5c657426",
+          "bucket_domain_name": "acme-health-intake-evidence-5c657426.s3.amazonaws.com",
+          "bucket_prefix": "",
+          "bucket_regional_domain_name": "acme-health-intake-evidence-5c657426.s3.us-east-1.amazonaws.com",
+          "cors_rule": [],
+          "force_destroy": false,
+          "grant": [
+            {
+              "id": "19b5bdeead60b342720812ced962877040b97038919278f9ef64cd7526c54cda",
+              "permissions": [
+                "FULL_CONTROL"
+              ],
+              "type": "CanonicalUser",
+              "uri": ""
+            }
+          ],
+          "hosted_zone_id": "Z3AQBSTGFYJSTF",
+          "id": "acme-health-intake-evidence-5c657426",
+          "lifecycle_rule": [],
+          "logging": [],
+          "object_lock_configuration": [
+            {
+              "object_lock_enabled": "Enabled",
+              "rule": [
+                {
+                  "default_retention": [
+                    {
+                      "days": 30,
+                      "mode": "GOVERNANCE",
+                      "years": 0
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "object_lock_enabled": true,
+          "policy": "{\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::acme-health-intake-evidence-5c657426/*\",\"arn:aws:s3:::acme-health-intake-evidence-5c657426\"],\"Sid\":\"DenyInsecureTransport\"}],\"Version\":\"2012-10-17\"}",
+          "region": "us-east-1",
+          "replication_configuration": [],
+          "request_payer": "BucketOwner",
+          "server_side_encryption_configuration": [
+            {
+              "rule": [
+                {
+                  "apply_server_side_encryption_by_default": [
+                    {
+                      "kms_master_key_id": "arn:aws:kms:us-east-1:111122223333:key/57edca98-ce75-48d7-8e53-a38e1404e4b9",
+                      "sse_algorithm": "aws:kms"
+                    }
+                  ],
+                  "bucket_key_enabled": true
+                }
+              ]
+            }
+          ],
+          "tags": {},
+          "tags_all": {
+            "DataClass": "phi",
+            "ManagedBy": "terraform",
+            "Project": "acme-health-intake",
+            "Workload": "patient-intake-api"
+          },
+          "timeouts": null,
+          "versioning": [
+            {
+              "enabled": true,
+              "mfa_delete": false
+            }
+          ],
+          "website": [],
+          "website_domain": null,
+          "website_endpoint": null
+        },
+        "after_unknown": {},
+        "before_sensitive": {
+          "cors_rule": [],
+          "grant": [
+            {
+              "permissions": [
+                false
+              ]
+            }
+          ],
+          "lifecycle_rule": [],
+          "logging": [],
+          "object_lock_configuration": [
+            {
+              "rule": [
+                {
+                  "default_retention": [
+                    {}
+                  ]
+                }
+              ]
+            }
+          ],
+          "replication_configuration": [],
+          "server_side_encryption_configuration": [
+            {
+              "rule": [
+                {
+                  "apply_server_side_encryption_by_default": [
+                    {}
+                  ]
+                }
+              ]
+            }
+          ],
+          "tags": {},
+          "tags_all": {},
+          "versioning": [
+            {}
+          ],
+          "website": []
+        },
+        "after_sensitive": {
+          "cors_rule": [],
+          "grant": [
+            {
+              "permissions": [
+                false
+              ]
+            }
+          ],
+          "lifecycle_rule": [],
+          "logging": [],
+          "object_lock_configuration": [
+            {
+              "rule": [
+                {
+                  "default_retention": [
+                    {}
+                  ]
+                }
+              ]
+            }
+          ],
+          "replication_configuration": [],
+          "server_side_encryption_configuration": [
+            {
+              "rule": [
+                {
+                  "apply_server_side_encryption_by_default": [
+                    {}
+                  ]
+                }
+              ]
+            }
+          ],
+          "tags": {},
+          "tags_all": {},
+          "versioning": [
+            {}
+          ],
+          "website": []
+        }
+      }
+    },
+    {
+      "address": "aws_s3_bucket.trail_logs",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "trail_logs",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "before": {
+          "acceleration_status": "",
+          "acl": null,
+          "arn": "arn:aws:s3:::acme-health-intake-trail-logs-5c657426",
+          "bucket": "acme-health-intake-trail-logs-5c657426",
+          "bucket_domain_name": "acme-health-intake-trail-logs-5c657426.s3.amazonaws.com",
+          "bucket_prefix": "",
+          "bucket_regional_domain_name": "acme-health-intake-trail-logs-5c657426.s3.us-east-1.amazonaws.com",
+          "cors_rule": [],
+          "force_destroy": false,
+          "grant": [
+            {
+              "id": "19b5bdeead60b342720812ced962877040b97038919278f9ef64cd7526c54cda",
+              "permissions": [
+                "FULL_CONTROL"
+              ],
+              "type": "CanonicalUser",
+              "uri": ""
+            }
+          ],
+          "hosted_zone_id": "Z3AQBSTGFYJSTF",
+          "id": "acme-health-intake-trail-logs-5c657426",
+          "lifecycle_rule": [],
+          "logging": [],
+          "object_lock_configuration": [],
+          "object_lock_enabled": false,
+          "policy": "{\"Statement\":[{\"Action\":\"s3:GetBucketAcl\",\"Condition\":{\"StringEquals\":{\"aws:SourceArn\":\"arn:aws:cloudtrail:us-east-1:111122223333:trail/acme-health-intake-trail\"}},\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Resource\":\"arn:aws:s3:::acme-health-intake-trail-logs-5c657426\",\"Sid\":\"CloudTrailAclCheck\"},{\"Action\":\"s3:PutObject\",\"Condition\":{\"StringEquals\":{\"aws:SourceArn\":\"arn:aws:cloudtrail:us-east-1:111122223333:trail/acme-health-intake-trail\",\"s3:x-amz-acl\":\"bucket-owner-full-control\"}},\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Resource\":\"arn:aws:s3:::acme-health-intake-trail-logs-5c657426/AWSLogs/111122223333/*\",\"Sid\":\"CloudTrailWrite\"},{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::acme-health-intake-trail-logs-5c657426/*\",\"arn:aws:s3:::acme-health-intake-trail-logs-5c657426\"],\"Sid\":\"DenyInsecureTransport\"}],\"Version\":\"2012-10-17\"}",
+          "region": "us-east-1",
+          "replication_configuration": [],
+          "request_payer": "BucketOwner",
+          "server_side_encryption_configuration": [
+            {
+              "rule": [
+                {
+                  "apply_server_side_encryption_by_default": [
+                    {
+                      "kms_master_key_id": "arn:aws:kms:us-east-1:111122223333:key/fea436d8-b017-4c92-b924-794b1de2275e",
+                      "sse_algorithm": "aws:kms"
+                    }
+                  ],
+                  "bucket_key_enabled": false
+                }
+              ]
+            }
+          ],
+          "tags": {},
+          "tags_all": {
+            "DataClass": "phi",
+            "ManagedBy": "terraform",
+            "Project": "acme-health-intake",
+            "Workload": "patient-intake-api"
+          },
+          "timeouts": null,
+          "versioning": [
+            {
+              "enabled": true,
+              "mfa_delete": false
+            }
+          ],
+          "website": [],
+          "website_domain": null,
+          "website_endpoint": null
+        },
+        "after": {
+          "acceleration_status": "",
+          "acl": null,
+          "arn": "arn:aws:s3:::acme-health-intake-trail-logs-5c657426",
+          "bucket": "acme-health-intake-trail-logs-5c657426",
+          "bucket_domain_name": "acme-health-intake-trail-logs-5c657426.s3.amazonaws.com",
+          "bucket_prefix": "",
+          "bucket_regional_domain_name": "acme-health-intake-trail-logs-5c657426.s3.us-east-1.amazonaws.com",
+          "cors_rule": [],
+          "force_destroy": false,
+          "grant": [
+            {
+              "id": "19b5bdeead60b342720812ced962877040b97038919278f9ef64cd7526c54cda",
+              "permissions": [
+                "FULL_CONTROL"
+              ],
+              "type": "CanonicalUser",
+              "uri": ""
+            }
+          ],
+          "hosted_zone_id": "Z3AQBSTGFYJSTF",
+          "id": "acme-health-intake-trail-logs-5c657426",
+          "lifecycle_rule": [],
+          "logging": [],
+          "object_lock_configuration": [],
+          "object_lock_enabled": false,
+          "policy": "{\"Statement\":[{\"Action\":\"s3:GetBucketAcl\",\"Condition\":{\"StringEquals\":{\"aws:SourceArn\":\"arn:aws:cloudtrail:us-east-1:111122223333:trail/acme-health-intake-trail\"}},\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Resource\":\"arn:aws:s3:::acme-health-intake-trail-logs-5c657426\",\"Sid\":\"CloudTrailAclCheck\"},{\"Action\":\"s3:PutObject\",\"Condition\":{\"StringEquals\":{\"aws:SourceArn\":\"arn:aws:cloudtrail:us-east-1:111122223333:trail/acme-health-intake-trail\",\"s3:x-amz-acl\":\"bucket-owner-full-control\"}},\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Resource\":\"arn:aws:s3:::acme-health-intake-trail-logs-5c657426/AWSLogs/111122223333/*\",\"Sid\":\"CloudTrailWrite\"},{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::acme-health-intake-trail-logs-5c657426/*\",\"arn:aws:s3:::acme-health-intake-trail-logs-5c657426\"],\"Sid\":\"DenyInsecureTransport\"}],\"Version\":\"2012-10-17\"}",
+          "region": "us-east-1",
+          "replication_configuration": [],
+          "request_payer": "BucketOwner",
+          "server_side_encryption_configuration": [
+            {
+              "rule": [
+                {
+                  "apply_server_side_encryption_by_default": [
+                    {
+                      "kms_master_key_id": "arn:aws:kms:us-east-1:111122223333:key/fea436d8-b017-4c92-b924-794b1de2275e",
+                      "sse_algorithm": "aws:kms"
+                    }
+                  ],
+                  "bucket_key_enabled": false
+                }
+              ]
+            }
+          ],
+          "tags": {},
+          "tags_all": {
+            "DataClass": "phi",
+            "ManagedBy": "terraform",
+            "Project": "acme-health-intake",
+            "Workload": "patient-intake-api"
+          },
+          "timeouts": null,
+          "versioning": [
+            {
+              "enabled": true,
+              "mfa_delete": false
+            }
+          ],
+          "website": [],
+          "website_domain": null,
+          "website_endpoint": null
+        },
+        "after_unknown": {},
+        "before_sensitive": {
+          "cors_rule": [],
+          "grant": [
+            {
+              "permissions": [
+                false
+              ]
+            }
+          ],
+          "lifecycle_rule": [],
+          "logging": [],
+          "object_lock_configuration": [],
+          "replication_configuration": [],
+          "server_side_encryption_configuration": [
+            {
+              "rule": [
+                {
+                  "apply_server_side_encryption_by_default": [
+                    {}
+                  ]
+                }
+              ]
+            }
+          ],
+          "tags": {},
+          "tags_all": {},
+          "versioning": [
+            {}
+          ],
+          "website": []
+        },
+        "after_sensitive": {
+          "cors_rule": [],
+          "grant": [
+            {
+              "permissions": [
+                false
+              ]
+            }
+          ],
+          "lifecycle_rule": [],
+          "logging": [],
+          "object_lock_configuration": [],
+          "replication_configuration": [],
+          "server_side_encryption_configuration": [
+            {
+              "rule": [
+                {
+                  "apply_server_side_encryption_by_default": [
+                    {}
+                  ]
+                }
+              ]
+            }
+          ],
+          "tags": {},
+          "tags_all": {},
+          "versioning": [
+            {}
+          ],
+          "website": []
+        }
+      }
+    },
+    {
+      "address": "aws_s3_bucket.uploads",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "uploads",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "before": {
+          "acceleration_status": "",
+          "acl": null,
+          "arn": "arn:aws:s3:::acme-health-intake-uploads-5c657426",
+          "bucket": "acme-health-intake-uploads-5c657426",
+          "bucket_domain_name": "acme-health-intake-uploads-5c657426.s3.amazonaws.com",
+          "bucket_prefix": "",
+          "bucket_regional_domain_name": "acme-health-intake-uploads-5c657426.s3.us-east-1.amazonaws.com",
+          "cors_rule": [],
+          "force_destroy": false,
+          "grant": [
+            {
+              "id": "19b5bdeead60b342720812ced962877040b97038919278f9ef64cd7526c54cda",
+              "permissions": [
+                "FULL_CONTROL"
+              ],
+              "type": "CanonicalUser",
+              "uri": ""
+            }
+          ],
+          "hosted_zone_id": "Z3AQBSTGFYJSTF",
+          "id": "acme-health-intake-uploads-5c657426",
+          "lifecycle_rule": [],
+          "logging": [],
+          "object_lock_configuration": [],
+          "object_lock_enabled": false,
+          "policy": "{\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::acme-health-intake-uploads-5c657426/*\",\"arn:aws:s3:::acme-health-intake-uploads-5c657426\"],\"Sid\":\"DenyInsecureTransport\"}],\"Version\":\"2012-10-17\"}",
+          "region": "us-east-1",
+          "replication_configuration": [],
+          "request_payer": "BucketOwner",
+          "server_side_encryption_configuration": [
+            {
+              "rule": [
+                {
+                  "apply_server_side_encryption_by_default": [
+                    {
+                      "kms_master_key_id": "arn:aws:kms:us-east-1:111122223333:key/392fb7fb-957b-494a-be2b-20bdfeb87852",
+                      "sse_algorithm": "aws:kms"
+                    }
+                  ],
+                  "bucket_key_enabled": true
+                }
+              ]
+            }
+          ],
+          "tags": {},
+          "tags_all": {
+            "DataClass": "phi",
+            "ManagedBy": "terraform",
+            "Project": "acme-health-intake",
+            "Workload": "patient-intake-api"
+          },
+          "timeouts": null,
+          "versioning": [
+            {
+              "enabled": true,
+              "mfa_delete": false
+            }
+          ],
+          "website": [],
+          "website_domain": null,
+          "website_endpoint": null
+        },
+        "after": {
+          "acceleration_status": "",
+          "acl": null,
+          "arn": "arn:aws:s3:::acme-health-intake-uploads-5c657426",
+          "bucket": "acme-health-intake-uploads-5c657426",
+          "bucket_domain_name": "acme-health-intake-uploads-5c657426.s3.amazonaws.com",
+          "bucket_prefix": "",
+          "bucket_regional_domain_name": "acme-health-intake-uploads-5c657426.s3.us-east-1.amazonaws.com",
+          "cors_rule": [],
+          "force_destroy": false,
+          "grant": [
+            {
+              "id": "19b5bdeead60b342720812ced962877040b97038919278f9ef64cd7526c54cda",
+              "permissions": [
+                "FULL_CONTROL"
+              ],
+              "type": "CanonicalUser",
+              "uri": ""
+            }
+          ],
+          "hosted_zone_id": "Z3AQBSTGFYJSTF",
+          "id": "acme-health-intake-uploads-5c657426",
+          "lifecycle_rule": [],
+          "logging": [],
+          "object_lock_configuration": [],
+          "object_lock_enabled": false,
+          "policy": "{\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::acme-health-intake-uploads-5c657426/*\",\"arn:aws:s3:::acme-health-intake-uploads-5c657426\"],\"Sid\":\"DenyInsecureTransport\"}],\"Version\":\"2012-10-17\"}",
+          "region": "us-east-1",
+          "replication_configuration": [],
+          "request_payer": "BucketOwner",
+          "server_side_encryption_configuration": [
+            {
+              "rule": [
+                {
+                  "apply_server_side_encryption_by_default": [
+                    {
+                      "kms_master_key_id": "arn:aws:kms:us-east-1:111122223333:key/392fb7fb-957b-494a-be2b-20bdfeb87852",
+                      "sse_algorithm": "aws:kms"
+                    }
+                  ],
+                  "bucket_key_enabled": true
+                }
+              ]
+            }
+          ],
+          "tags": {},
+          "tags_all": {
+            "DataClass": "phi",
+            "ManagedBy": "terraform",
+            "Project": "acme-health-intake",
+            "Workload": "patient-intake-api"
+          },
+          "timeouts": null,
+          "versioning": [
+            {
+              "enabled": true,
+              "mfa_delete": false
+            }
+          ],
+          "website": [],
+          "website_domain": null,
+          "website_endpoint": null
+        },
+        "after_unknown": {},
+        "before_sensitive": {
+          "cors_rule": [],
+          "grant": [
+            {
+              "permissions": [
+                false
+              ]
+            }
+          ],
+          "lifecycle_rule": [],
+          "logging": [],
+          "object_lock_configuration": [],
+          "replication_configuration": [],
+          "server_side_encryption_configuration": [
+            {
+              "rule": [
+                {
+                  "apply_server_side_encryption_by_default": [
+                    {}
+                  ]
+                }
+              ]
+            }
+          ],
+          "tags": {},
+          "tags_all": {},
+          "versioning": [
+            {}
+          ],
+          "website": []
+        },
+        "after_sensitive": {
+          "cors_rule": [],
+          "grant": [
+            {
+              "permissions": [
+                false
+              ]
+            }
+          ],
+          "lifecycle_rule": [],
+          "logging": [],
+          "object_lock_configuration": [],
+          "replication_configuration": [],
+          "server_side_encryption_configuration": [
+            {
+              "rule": [
+                {
+                  "apply_server_side_encryption_by_default": [
+                    {}
+                  ]
+                }
+              ]
+            }
+          ],
+          "tags": {},
+          "tags_all": {},
+          "versioning": [
+            {}
+          ],
+          "website": []
+        }
+      }
+    },
+    {
+      "address": "aws_s3_bucket_policy.config_tls_only",
+      "mode": "managed",
+      "type": "aws_s3_bucket_policy",
+      "name": "config_tls_only",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "before": {
+          "bucket": "acme-health-intake-config-5c657426",
+          "id": "acme-health-intake-config-5c657426",
+          "policy": "{\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::acme-health-intake-config-5c657426/*\",\"arn:aws:s3:::acme-health-intake-config-5c657426\"],\"Sid\":\"DenyInsecureTransport\"}],\"Version\":\"2012-10-17\"}"
+        },
+        "after": {
+          "bucket": "acme-health-intake-config-5c657426",
+          "id": "acme-health-intake-config-5c657426",
+          "policy": "{\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::acme-health-intake-config-5c657426/*\",\"arn:aws:s3:::acme-health-intake-config-5c657426\"],\"Sid\":\"DenyInsecureTransport\"}],\"Version\":\"2012-10-17\"}"
+        },
+        "after_unknown": {},
+        "before_sensitive": {},
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_s3_bucket_policy.evidence_tls_only",
+      "mode": "managed",
+      "type": "aws_s3_bucket_policy",
+      "name": "evidence_tls_only",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "before": {
+          "bucket": "acme-health-intake-evidence-5c657426",
+          "id": "acme-health-intake-evidence-5c657426",
+          "policy": "{\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::acme-health-intake-evidence-5c657426/*\",\"arn:aws:s3:::acme-health-intake-evidence-5c657426\"],\"Sid\":\"DenyInsecureTransport\"}],\"Version\":\"2012-10-17\"}"
+        },
+        "after": {
+          "bucket": "acme-health-intake-evidence-5c657426",
+          "id": "acme-health-intake-evidence-5c657426",
+          "policy": "{\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::acme-health-intake-evidence-5c657426/*\",\"arn:aws:s3:::acme-health-intake-evidence-5c657426\"],\"Sid\":\"DenyInsecureTransport\"}],\"Version\":\"2012-10-17\"}"
+        },
+        "after_unknown": {},
+        "before_sensitive": {},
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_s3_bucket_policy.trail_logs",
+      "mode": "managed",
+      "type": "aws_s3_bucket_policy",
+      "name": "trail_logs",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "before": {
+          "bucket": "acme-health-intake-trail-logs-5c657426",
+          "id": "acme-health-intake-trail-logs-5c657426",
+          "policy": "{\"Statement\":[{\"Action\":\"s3:GetBucketAcl\",\"Condition\":{\"StringEquals\":{\"aws:SourceArn\":\"arn:aws:cloudtrail:us-east-1:111122223333:trail/acme-health-intake-trail\"}},\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Resource\":\"arn:aws:s3:::acme-health-intake-trail-logs-5c657426\",\"Sid\":\"CloudTrailAclCheck\"},{\"Action\":\"s3:PutObject\",\"Condition\":{\"StringEquals\":{\"aws:SourceArn\":\"arn:aws:cloudtrail:us-east-1:111122223333:trail/acme-health-intake-trail\",\"s3:x-amz-acl\":\"bucket-owner-full-control\"}},\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Resource\":\"arn:aws:s3:::acme-health-intake-trail-logs-5c657426/AWSLogs/111122223333/*\",\"Sid\":\"CloudTrailWrite\"},{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::acme-health-intake-trail-logs-5c657426/*\",\"arn:aws:s3:::acme-health-intake-trail-logs-5c657426\"],\"Sid\":\"DenyInsecureTransport\"}],\"Version\":\"2012-10-17\"}"
+        },
+        "after": {
+          "bucket": "acme-health-intake-trail-logs-5c657426",
+          "id": "acme-health-intake-trail-logs-5c657426",
+          "policy": "{\"Statement\":[{\"Action\":\"s3:GetBucketAcl\",\"Condition\":{\"StringEquals\":{\"aws:SourceArn\":\"arn:aws:cloudtrail:us-east-1:111122223333:trail/acme-health-intake-trail\"}},\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Resource\":\"arn:aws:s3:::acme-health-intake-trail-logs-5c657426\",\"Sid\":\"CloudTrailAclCheck\"},{\"Action\":\"s3:PutObject\",\"Condition\":{\"StringEquals\":{\"aws:SourceArn\":\"arn:aws:cloudtrail:us-east-1:111122223333:trail/acme-health-intake-trail\",\"s3:x-amz-acl\":\"bucket-owner-full-control\"}},\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Resource\":\"arn:aws:s3:::acme-health-intake-trail-logs-5c657426/AWSLogs/111122223333/*\",\"Sid\":\"CloudTrailWrite\"},{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::acme-health-intake-trail-logs-5c657426/*\",\"arn:aws:s3:::acme-health-intake-trail-logs-5c657426\"],\"Sid\":\"DenyInsecureTransport\"}],\"Version\":\"2012-10-17\"}"
+        },
+        "after_unknown": {},
+        "before_sensitive": {},
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_s3_bucket_policy.uploads_tls_only",
+      "mode": "managed",
+      "type": "aws_s3_bucket_policy",
+      "name": "uploads_tls_only",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "before": {
+          "bucket": "acme-health-intake-uploads-5c657426",
+          "id": "acme-health-intake-uploads-5c657426",
+          "policy": "{\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::acme-health-intake-uploads-5c657426/*\",\"arn:aws:s3:::acme-health-intake-uploads-5c657426\"],\"Sid\":\"DenyInsecureTransport\"}],\"Version\":\"2012-10-17\"}"
+        },
+        "after": {
+          "bucket": "acme-health-intake-uploads-5c657426",
+          "id": "acme-health-intake-uploads-5c657426",
+          "policy": "{\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}},\"Effect\":\"Deny\",\"Principal\":\"*\",\"Resource\":[\"arn:aws:s3:::acme-health-intake-uploads-5c657426/*\",\"arn:aws:s3:::acme-health-intake-uploads-5c657426\"],\"Sid\":\"DenyInsecureTransport\"}],\"Version\":\"2012-10-17\"}"
+        },
+        "after_unknown": {},
+        "before_sensitive": {},
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_s3_bucket_server_side_encryption_configuration.trail_logs",
+      "mode": "managed",
+      "type": "aws_s3_bucket_server_side_encryption_configuration",
+      "name": "trail_logs",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "before": {
+          "bucket": "acme-health-intake-trail-logs-5c657426",
+          "expected_bucket_owner": "",
+          "id": "acme-health-intake-trail-logs-5c657426",
+          "rule": [
+            {
+              "apply_server_side_encryption_by_default": [
+                {
+                  "kms_master_key_id": "arn:aws:kms:us-east-1:111122223333:key/fea436d8-b017-4c92-b924-794b1de2275e",
+                  "sse_algorithm": "aws:kms"
+                }
+              ],
+              "bucket_key_enabled": false
+            }
+          ]
+        },
+        "after": {
+          "bucket": "acme-health-intake-trail-logs-5c657426",
+          "expected_bucket_owner": "",
+          "id": "acme-health-intake-trail-logs-5c657426",
+          "rule": [
+            {
+              "apply_server_side_encryption_by_default": [
+                {
+                  "kms_master_key_id": "arn:aws:kms:us-east-1:111122223333:key/fea436d8-b017-4c92-b924-794b1de2275e",
+                  "sse_algorithm": "aws:kms"
+                }
+              ],
+              "bucket_key_enabled": false
+            }
+          ]
+        },
+        "after_unknown": {},
+        "before_sensitive": {
+          "rule": [
+            {
+              "apply_server_side_encryption_by_default": [
+                {}
+              ]
+            }
+          ]
+        },
+        "after_sensitive": {
+          "rule": [
+            {
+              "apply_server_side_encryption_by_default": [
+                {}
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "address": "module.config_storage.aws_s3_bucket_server_side_encryption_configuration.this",
+      "module_address": "module.config_storage",
+      "mode": "managed",
+      "type": "aws_s3_bucket_server_side_encryption_configuration",
+      "name": "this",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "before": {
+          "bucket": "acme-health-intake-config-5c657426",
+          "expected_bucket_owner": "",
+          "id": "acme-health-intake-config-5c657426",
+          "rule": [
+            {
+              "apply_server_side_encryption_by_default": [
+                {
+                  "kms_master_key_id": "arn:aws:kms:us-east-1:111122223333:key/15592021-c3eb-4ec0-940a-3c2c9e79baa4",
+                  "sse_algorithm": "aws:kms"
+                }
+              ],
+              "bucket_key_enabled": true
+            }
+          ]
+        },
+        "after": {
+          "bucket": "acme-health-intake-config-5c657426",
+          "expected_bucket_owner": "",
+          "id": "acme-health-intake-config-5c657426",
+          "rule": [
+            {
+              "apply_server_side_encryption_by_default": [
+                {
+                  "kms_master_key_id": "arn:aws:kms:us-east-1:111122223333:key/15592021-c3eb-4ec0-940a-3c2c9e79baa4",
+                  "sse_algorithm": "aws:kms"
+                }
+              ],
+              "bucket_key_enabled": true
+            }
+          ]
+        },
+        "after_unknown": {},
+        "before_sensitive": {
+          "rule": [
+            {
+              "apply_server_side_encryption_by_default": [
+                {}
+              ]
+            }
+          ]
+        },
+        "after_sensitive": {
+          "rule": [
+            {
+              "apply_server_side_encryption_by_default": [
+                {}
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "address": "module.evidence_storage.aws_s3_bucket_server_side_encryption_configuration.this",
+      "module_address": "module.evidence_storage",
+      "mode": "managed",
+      "type": "aws_s3_bucket_server_side_encryption_configuration",
+      "name": "this",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "before": {
+          "bucket": "acme-health-intake-evidence-5c657426",
+          "expected_bucket_owner": "",
+          "id": "acme-health-intake-evidence-5c657426",
+          "rule": [
+            {
+              "apply_server_side_encryption_by_default": [
+                {
+                  "kms_master_key_id": "arn:aws:kms:us-east-1:111122223333:key/57edca98-ce75-48d7-8e53-a38e1404e4b9",
+                  "sse_algorithm": "aws:kms"
+                }
+              ],
+              "bucket_key_enabled": true
+            }
+          ]
+        },
+        "after": {
+          "bucket": "acme-health-intake-evidence-5c657426",
+          "expected_bucket_owner": "",
+          "id": "acme-health-intake-evidence-5c657426",
+          "rule": [
+            {
+              "apply_server_side_encryption_by_default": [
+                {
+                  "kms_master_key_id": "arn:aws:kms:us-east-1:111122223333:key/57edca98-ce75-48d7-8e53-a38e1404e4b9",
+                  "sse_algorithm": "aws:kms"
+                }
+              ],
+              "bucket_key_enabled": true
+            }
+          ]
+        },
+        "after_unknown": {},
+        "before_sensitive": {
+          "rule": [
+            {
+              "apply_server_side_encryption_by_default": [
+                {}
+              ]
+            }
+          ]
+        },
+        "after_sensitive": {
+          "rule": [
+            {
+              "apply_server_side_encryption_by_default": [
+                {}
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "address": "module.uploads_storage.aws_s3_bucket_server_side_encryption_configuration.this",
+      "module_address": "module.uploads_storage",
+      "mode": "managed",
+      "type": "aws_s3_bucket_server_side_encryption_configuration",
+      "name": "this",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "before": {
+          "bucket": "acme-health-intake-uploads-5c657426",
+          "expected_bucket_owner": "",
+          "id": "acme-health-intake-uploads-5c657426",
+          "rule": [
+            {
+              "apply_server_side_encryption_by_default": [
+                {
+                  "kms_master_key_id": "arn:aws:kms:us-east-1:111122223333:key/392fb7fb-957b-494a-be2b-20bdfeb87852",
+                  "sse_algorithm": "aws:kms"
+                }
+              ],
+              "bucket_key_enabled": true
+            }
+          ]
+        },
+        "after": {
+          "bucket": "acme-health-intake-uploads-5c657426",
+          "expected_bucket_owner": "",
+          "id": "acme-health-intake-uploads-5c657426",
+          "rule": [
+            {
+              "apply_server_side_encryption_by_default": [
+                {
+                  "kms_master_key_id": "arn:aws:kms:us-east-1:111122223333:key/392fb7fb-957b-494a-be2b-20bdfeb87852",
+                  "sse_algorithm": "aws:kms"
+                }
+              ],
+              "bucket_key_enabled": true
+            }
+          ]
+        },
+        "after_unknown": {},
+        "before_sensitive": {
+          "rule": [
+            {
+              "apply_server_side_encryption_by_default": [
+                {}
+              ]
+            }
+          ]
+        },
+        "after_sensitive": {
+          "rule": [
+            {
+              "apply_server_side_encryption_by_default": [
+                {}
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration": {
+    "root_module": {
+      "resources": [
+        {
+          "address": "aws_s3_bucket_policy.config_tls_only",
+          "mode": "managed",
+          "type": "aws_s3_bucket_policy",
+          "name": "config_tls_only",
+          "provider_config_key": "aws",
+          "expressions": {
+            "bucket": {
+              "references": [
+                "aws_s3_bucket.config.id",
+                "aws_s3_bucket.config"
+              ]
+            },
+            "policy": {
+              "references": [
+                "data.aws_iam_policy_document.config_tls_only.json",
+                "data.aws_iam_policy_document.config_tls_only"
+              ]
+            }
+          },
+          "schema_version": 0,
+          "depends_on": [
+            "module.config_storage"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_policy.evidence_tls_only",
+          "mode": "managed",
+          "type": "aws_s3_bucket_policy",
+          "name": "evidence_tls_only",
+          "provider_config_key": "aws",
+          "expressions": {
+            "bucket": {
+              "references": [
+                "aws_s3_bucket.evidence.id",
+                "aws_s3_bucket.evidence"
+              ]
+            },
+            "policy": {
+              "references": [
+                "data.aws_iam_policy_document.evidence_tls_only.json",
+                "data.aws_iam_policy_document.evidence_tls_only"
+              ]
+            }
+          },
+          "schema_version": 0,
+          "depends_on": [
+            "module.evidence_storage"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_policy.trail_logs",
+          "mode": "managed",
+          "type": "aws_s3_bucket_policy",
+          "name": "trail_logs",
+          "provider_config_key": "aws",
+          "expressions": {
+            "bucket": {
+              "references": [
+                "aws_s3_bucket.trail_logs.id",
+                "aws_s3_bucket.trail_logs"
+              ]
+            },
+            "policy": {
+              "references": [
+                "data.aws_iam_policy_document.trail_logs.json",
+                "data.aws_iam_policy_document.trail_logs"
+              ]
+            }
+          },
+          "schema_version": 0,
+          "depends_on": [
+            "aws_s3_bucket_public_access_block.trail_logs"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_policy.uploads_tls_only",
+          "mode": "managed",
+          "type": "aws_s3_bucket_policy",
+          "name": "uploads_tls_only",
+          "provider_config_key": "aws",
+          "expressions": {
+            "bucket": {
+              "references": [
+                "aws_s3_bucket.uploads.id",
+                "aws_s3_bucket.uploads"
+              ]
+            },
+            "policy": {
+              "references": [
+                "data.aws_iam_policy_document.uploads_tls_only.json",
+                "data.aws_iam_policy_document.uploads_tls_only"
+              ]
+            }
+          },
+          "schema_version": 0,
+          "depends_on": [
+            "module.uploads_storage"
+          ]
+        }
+      ]
+    }
+  },
+  "prior_state": {
+    "values": {
+      "root_module": {
+        "resources": [
+          {
+            "address": "data.aws_iam_policy_document.alerts_key",
+            "mode": "data",
+            "type": "aws_iam_policy_document",
+            "name": "alerts_key",
+            "provider_name": "registry.terraform.io/hashicorp/aws",
+            "schema_version": 0,
+            "values": {
+              "id": "2423403293",
+              "json": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"AccountAdministration\",\n      \"Effect\": \"Allow\",\n      \"Action\": \"kms:*\",\n      \"Resource\": \"*\",\n      \"Principal\": {\n        \"AWS\": \"arn:aws:iam::111122223333:root\"\n      }\n    },\n    {\n      \"Sid\": \"EventBridgePublishToEncryptedTopic\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"kms:GenerateDataKey*\",\n        \"kms:Decrypt\"\n      ],\n      \"Resource\": \"*\",\n      \"Principal\": {\n        \"Service\": \"events.amazonaws.com\"\n      }\n    }\n  ]\n}",
+              "minified_json": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AccountAdministration\",\"Effect\":\"Allow\",\"Action\":\"kms:*\",\"Resource\":\"*\",\"Principal\":{\"AWS\":\"arn:aws:iam::111122223333:root\"}},{\"Sid\":\"EventBridgePublishToEncryptedTopic\",\"Effect\":\"Allow\",\"Action\":[\"kms:GenerateDataKey*\",\"kms:Decrypt\"],\"Resource\":\"*\",\"Principal\":{\"Service\":\"events.amazonaws.com\"}}]}",
+              "override_json": null,
+              "override_policy_documents": null,
+              "policy_id": null,
+              "source_json": null,
+              "source_policy_documents": null,
+              "statement": [
+                {
+                  "actions": [
+                    "kms:*"
+                  ],
+                  "condition": [],
+                  "effect": "Allow",
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [
+                    {
+                      "identifiers": [
+                        "arn:aws:iam::111122223333:root"
+                      ],
+                      "type": "AWS"
+                    }
+                  ],
+                  "resources": [
+                    "*"
+                  ],
+                  "sid": "AccountAdministration"
+                },
+                {
+                  "actions": [
+                    "kms:Decrypt",
+                    "kms:GenerateDataKey*"
+                  ],
+                  "condition": [],
+                  "effect": "Allow",
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [
+                    {
+                      "identifiers": [
+                        "events.amazonaws.com"
+                      ],
+                      "type": "Service"
+                    }
+                  ],
+                  "resources": [
+                    "*"
+                  ],
+                  "sid": "EventBridgePublishToEncryptedTopic"
+                }
+              ],
+              "version": "2012-10-17"
+            },
+            "sensitive_values": {
+              "statement": [
+                {
+                  "actions": [
+                    false
+                  ],
+                  "condition": [],
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [
+                    {
+                      "identifiers": [
+                        false
+                      ]
+                    }
+                  ],
+                  "resources": [
+                    false
+                  ]
+                },
+                {
+                  "actions": [
+                    false,
+                    false
+                  ],
+                  "condition": [],
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [
+                    {
+                      "identifiers": [
+                        false
+                      ]
+                    }
+                  ],
+                  "resources": [
+                    false
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "address": "data.aws_iam_policy_document.alerts_topic",
+            "mode": "data",
+            "type": "aws_iam_policy_document",
+            "name": "alerts_topic",
+            "provider_name": "registry.terraform.io/hashicorp/aws",
+            "schema_version": 0,
+            "values": {
+              "id": "3729065721",
+              "json": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"AllowEventBridgePublish\",\n      \"Effect\": \"Allow\",\n      \"Action\": \"sns:Publish\",\n      \"Resource\": \"arn:aws:sns:us-east-1:111122223333:acme-health-intake-compliance-alerts-5c657426\",\n      \"Principal\": {\n        \"Service\": \"events.amazonaws.com\"\n      },\n      \"Condition\": {\n        \"ArnEquals\": {\n          \"aws:SourceArn\": \"arn:aws:events:us-east-1:111122223333:rule/acme-health-intake-config-noncompliant-5c657426\"\n        }\n      }\n    }\n  ]\n}",
+              "minified_json": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AllowEventBridgePublish\",\"Effect\":\"Allow\",\"Action\":\"sns:Publish\",\"Resource\":\"arn:aws:sns:us-east-1:111122223333:acme-health-intake-compliance-alerts-5c657426\",\"Principal\":{\"Service\":\"events.amazonaws.com\"},\"Condition\":{\"ArnEquals\":{\"aws:SourceArn\":\"arn:aws:events:us-east-1:111122223333:rule/acme-health-intake-config-noncompliant-5c657426\"}}}]}",
+              "override_json": null,
+              "override_policy_documents": null,
+              "policy_id": null,
+              "source_json": null,
+              "source_policy_documents": null,
+              "statement": [
+                {
+                  "actions": [
+                    "sns:Publish"
+                  ],
+                  "condition": [
+                    {
+                      "test": "ArnEquals",
+                      "values": [
+                        "arn:aws:events:us-east-1:111122223333:rule/acme-health-intake-config-noncompliant-5c657426"
+                      ],
+                      "variable": "aws:SourceArn"
+                    }
+                  ],
+                  "effect": "Allow",
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [
+                    {
+                      "identifiers": [
+                        "events.amazonaws.com"
+                      ],
+                      "type": "Service"
+                    }
+                  ],
+                  "resources": [
+                    "arn:aws:sns:us-east-1:111122223333:acme-health-intake-compliance-alerts-5c657426"
+                  ],
+                  "sid": "AllowEventBridgePublish"
+                }
+              ],
+              "version": "2012-10-17"
+            },
+            "sensitive_values": {
+              "statement": [
+                {
+                  "actions": [
+                    false
+                  ],
+                  "condition": [
+                    {
+                      "values": [
+                        false
+                      ]
+                    }
+                  ],
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [
+                    {
+                      "identifiers": [
+                        false
+                      ]
+                    }
+                  ],
+                  "resources": [
+                    false
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "address": "data.aws_iam_policy_document.config_delivery",
+            "mode": "data",
+            "type": "aws_iam_policy_document",
+            "name": "config_delivery",
+            "provider_name": "registry.terraform.io/hashicorp/aws",
+            "schema_version": 0,
+            "values": {
+              "id": "2605680585",
+              "json": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"ReadBucketAcl\",\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:GetBucketAcl\",\n      \"Resource\": \"arn:aws:s3:::acme-health-intake-config-5c657426\"\n    },\n    {\n      \"Sid\": \"WriteConfigRecords\",\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:PutObject\",\n      \"Resource\": \"arn:aws:s3:::acme-health-intake-config-5c657426/AWSLogs/111122223333/Config/*\",\n      \"Condition\": {\n        \"StringEquals\": {\n          \"s3:x-amz-acl\": \"bucket-owner-full-control\"\n        }\n      }\n    },\n    {\n      \"Sid\": \"UseBucketKey\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"kms:GenerateDataKey\",\n        \"kms:Decrypt\"\n      ],\n      \"Resource\": \"arn:aws:kms:us-east-1:111122223333:key/15592021-c3eb-4ec0-940a-3c2c9e79baa4\"\n    }\n  ]\n}",
+              "minified_json": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"ReadBucketAcl\",\"Effect\":\"Allow\",\"Action\":\"s3:GetBucketAcl\",\"Resource\":\"arn:aws:s3:::acme-health-intake-config-5c657426\"},{\"Sid\":\"WriteConfigRecords\",\"Effect\":\"Allow\",\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::acme-health-intake-config-5c657426/AWSLogs/111122223333/Config/*\",\"Condition\":{\"StringEquals\":{\"s3:x-amz-acl\":\"bucket-owner-full-control\"}}},{\"Sid\":\"UseBucketKey\",\"Effect\":\"Allow\",\"Action\":[\"kms:GenerateDataKey\",\"kms:Decrypt\"],\"Resource\":\"arn:aws:kms:us-east-1:111122223333:key/15592021-c3eb-4ec0-940a-3c2c9e79baa4\"}]}",
+              "override_json": null,
+              "override_policy_documents": null,
+              "policy_id": null,
+              "source_json": null,
+              "source_policy_documents": null,
+              "statement": [
+                {
+                  "actions": [
+                    "s3:GetBucketAcl"
+                  ],
+                  "condition": [],
+                  "effect": "Allow",
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [],
+                  "resources": [
+                    "arn:aws:s3:::acme-health-intake-config-5c657426"
+                  ],
+                  "sid": "ReadBucketAcl"
+                },
+                {
+                  "actions": [
+                    "s3:PutObject"
+                  ],
+                  "condition": [
+                    {
+                      "test": "StringEquals",
+                      "values": [
+                        "bucket-owner-full-control"
+                      ],
+                      "variable": "s3:x-amz-acl"
+                    }
+                  ],
+                  "effect": "Allow",
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [],
+                  "resources": [
+                    "arn:aws:s3:::acme-health-intake-config-5c657426/AWSLogs/111122223333/Config/*"
+                  ],
+                  "sid": "WriteConfigRecords"
+                },
+                {
+                  "actions": [
+                    "kms:Decrypt",
+                    "kms:GenerateDataKey"
+                  ],
+                  "condition": [],
+                  "effect": "Allow",
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [],
+                  "resources": [
+                    "arn:aws:kms:us-east-1:111122223333:key/15592021-c3eb-4ec0-940a-3c2c9e79baa4"
+                  ],
+                  "sid": "UseBucketKey"
+                }
+              ],
+              "version": "2012-10-17"
+            },
+            "sensitive_values": {
+              "statement": [
+                {
+                  "actions": [
+                    false
+                  ],
+                  "condition": [],
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [],
+                  "resources": [
+                    false
+                  ]
+                },
+                {
+                  "actions": [
+                    false
+                  ],
+                  "condition": [
+                    {
+                      "values": [
+                        false
+                      ]
+                    }
+                  ],
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [],
+                  "resources": [
+                    false
+                  ]
+                },
+                {
+                  "actions": [
+                    false,
+                    false
+                  ],
+                  "condition": [],
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [],
+                  "resources": [
+                    false
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "address": "data.aws_iam_policy_document.config_tls_only",
+            "mode": "data",
+            "type": "aws_iam_policy_document",
+            "name": "config_tls_only",
+            "provider_name": "registry.terraform.io/hashicorp/aws",
+            "schema_version": 0,
+            "values": {
+              "id": "3187143094",
+              "json": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyInsecureTransport\",\n      \"Effect\": \"Deny\",\n      \"Action\": \"s3:*\",\n      \"Resource\": [\n        \"arn:aws:s3:::acme-health-intake-config-5c657426/*\",\n        \"arn:aws:s3:::acme-health-intake-config-5c657426\"\n      ],\n      \"Principal\": \"*\",\n      \"Condition\": {\n        \"Bool\": {\n          \"aws:SecureTransport\": \"false\"\n        }\n      }\n    }\n  ]\n}",
+              "minified_json": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"DenyInsecureTransport\",\"Effect\":\"Deny\",\"Action\":\"s3:*\",\"Resource\":[\"arn:aws:s3:::acme-health-intake-config-5c657426/*\",\"arn:aws:s3:::acme-health-intake-config-5c657426\"],\"Principal\":\"*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}}}]}",
+              "override_json": null,
+              "override_policy_documents": null,
+              "policy_id": null,
+              "source_json": null,
+              "source_policy_documents": null,
+              "statement": [
+                {
+                  "actions": [
+                    "s3:*"
+                  ],
+                  "condition": [
+                    {
+                      "test": "Bool",
+                      "values": [
+                        "false"
+                      ],
+                      "variable": "aws:SecureTransport"
+                    }
+                  ],
+                  "effect": "Deny",
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [
+                    {
+                      "identifiers": [
+                        "*"
+                      ],
+                      "type": "*"
+                    }
+                  ],
+                  "resources": [
+                    "arn:aws:s3:::acme-health-intake-config-5c657426",
+                    "arn:aws:s3:::acme-health-intake-config-5c657426/*"
+                  ],
+                  "sid": "DenyInsecureTransport"
+                }
+              ],
+              "version": "2012-10-17"
+            },
+            "sensitive_values": {
+              "statement": [
+                {
+                  "actions": [
+                    false
+                  ],
+                  "condition": [
+                    {
+                      "values": [
+                        false
+                      ]
+                    }
+                  ],
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [
+                    {
+                      "identifiers": [
+                        false
+                      ]
+                    }
+                  ],
+                  "resources": [
+                    false,
+                    false
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "address": "data.aws_iam_policy_document.evidence_tls_only",
+            "mode": "data",
+            "type": "aws_iam_policy_document",
+            "name": "evidence_tls_only",
+            "provider_name": "registry.terraform.io/hashicorp/aws",
+            "schema_version": 0,
+            "values": {
+              "id": "3855411677",
+              "json": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyInsecureTransport\",\n      \"Effect\": \"Deny\",\n      \"Action\": \"s3:*\",\n      \"Resource\": [\n        \"arn:aws:s3:::acme-health-intake-evidence-5c657426/*\",\n        \"arn:aws:s3:::acme-health-intake-evidence-5c657426\"\n      ],\n      \"Principal\": \"*\",\n      \"Condition\": {\n        \"Bool\": {\n          \"aws:SecureTransport\": \"false\"\n        }\n      }\n    }\n  ]\n}",
+              "minified_json": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"DenyInsecureTransport\",\"Effect\":\"Deny\",\"Action\":\"s3:*\",\"Resource\":[\"arn:aws:s3:::acme-health-intake-evidence-5c657426/*\",\"arn:aws:s3:::acme-health-intake-evidence-5c657426\"],\"Principal\":\"*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}}}]}",
+              "override_json": null,
+              "override_policy_documents": null,
+              "policy_id": null,
+              "source_json": null,
+              "source_policy_documents": null,
+              "statement": [
+                {
+                  "actions": [
+                    "s3:*"
+                  ],
+                  "condition": [
+                    {
+                      "test": "Bool",
+                      "values": [
+                        "false"
+                      ],
+                      "variable": "aws:SecureTransport"
+                    }
+                  ],
+                  "effect": "Deny",
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [
+                    {
+                      "identifiers": [
+                        "*"
+                      ],
+                      "type": "*"
+                    }
+                  ],
+                  "resources": [
+                    "arn:aws:s3:::acme-health-intake-evidence-5c657426",
+                    "arn:aws:s3:::acme-health-intake-evidence-5c657426/*"
+                  ],
+                  "sid": "DenyInsecureTransport"
+                }
+              ],
+              "version": "2012-10-17"
+            },
+            "sensitive_values": {
+              "statement": [
+                {
+                  "actions": [
+                    false
+                  ],
+                  "condition": [
+                    {
+                      "values": [
+                        false
+                      ]
+                    }
+                  ],
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [
+                    {
+                      "identifiers": [
+                        false
+                      ]
+                    }
+                  ],
+                  "resources": [
+                    false,
+                    false
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "address": "data.aws_iam_policy_document.lambda_data_access",
+            "mode": "data",
+            "type": "aws_iam_policy_document",
+            "name": "lambda_data_access",
+            "provider_name": "registry.terraform.io/hashicorp/aws",
+            "schema_version": 0,
+            "values": {
+              "id": "2106564195",
+              "json": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"WriteSubmissions\",\n      \"Effect\": \"Allow\",\n      \"Action\": \"dynamodb:PutItem\",\n      \"Resource\": \"arn:aws:dynamodb:us-east-1:111122223333:table/acme-health-intake-submissions-5c657426\"\n    },\n    {\n      \"Sid\": \"WriteAttachments\",\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:PutObject\",\n      \"Resource\": \"arn:aws:s3:::acme-health-intake-uploads-5c657426/uploads/*\"\n    },\n    {\n      \"Sid\": \"UseDataKeys\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"kms:GenerateDataKey\",\n        \"kms:Decrypt\"\n      ],\n      \"Resource\": [\n        \"arn:aws:kms:us-east-1:111122223333:key/de46b213-412f-4713-82a6-23e144ba132f\",\n        \"arn:aws:kms:us-east-1:111122223333:key/392fb7fb-957b-494a-be2b-20bdfeb87852\"\n      ]\n    },\n    {\n      \"Sid\": \"SendTraces\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"xray:PutTraceSegments\",\n        \"xray:PutTelemetryRecords\"\n      ],\n      \"Resource\": \"*\"\n    }\n  ]\n}",
+              "minified_json": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"WriteSubmissions\",\"Effect\":\"Allow\",\"Action\":\"dynamodb:PutItem\",\"Resource\":\"arn:aws:dynamodb:us-east-1:111122223333:table/acme-health-intake-submissions-5c657426\"},{\"Sid\":\"WriteAttachments\",\"Effect\":\"Allow\",\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::acme-health-intake-uploads-5c657426/uploads/*\"},{\"Sid\":\"UseDataKeys\",\"Effect\":\"Allow\",\"Action\":[\"kms:GenerateDataKey\",\"kms:Decrypt\"],\"Resource\":[\"arn:aws:kms:us-east-1:111122223333:key/de46b213-412f-4713-82a6-23e144ba132f\",\"arn:aws:kms:us-east-1:111122223333:key/392fb7fb-957b-494a-be2b-20bdfeb87852\"]},{\"Sid\":\"SendTraces\",\"Effect\":\"Allow\",\"Action\":[\"xray:PutTraceSegments\",\"xray:PutTelemetryRecords\"],\"Resource\":\"*\"}]}",
+              "override_json": null,
+              "override_policy_documents": null,
+              "policy_id": null,
+              "source_json": null,
+              "source_policy_documents": null,
+              "statement": [
+                {
+                  "actions": [
+                    "dynamodb:PutItem"
+                  ],
+                  "condition": [],
+                  "effect": "Allow",
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [],
+                  "resources": [
+                    "arn:aws:dynamodb:us-east-1:111122223333:table/acme-health-intake-submissions-5c657426"
+                  ],
+                  "sid": "WriteSubmissions"
+                },
+                {
+                  "actions": [
+                    "s3:PutObject"
+                  ],
+                  "condition": [],
+                  "effect": "Allow",
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [],
+                  "resources": [
+                    "arn:aws:s3:::acme-health-intake-uploads-5c657426/uploads/*"
+                  ],
+                  "sid": "WriteAttachments"
+                },
+                {
+                  "actions": [
+                    "kms:Decrypt",
+                    "kms:GenerateDataKey"
+                  ],
+                  "condition": [],
+                  "effect": "Allow",
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [],
+                  "resources": [
+                    "arn:aws:kms:us-east-1:111122223333:key/392fb7fb-957b-494a-be2b-20bdfeb87852",
+                    "arn:aws:kms:us-east-1:111122223333:key/de46b213-412f-4713-82a6-23e144ba132f"
+                  ],
+                  "sid": "UseDataKeys"
+                },
+                {
+                  "actions": [
+                    "xray:PutTelemetryRecords",
+                    "xray:PutTraceSegments"
+                  ],
+                  "condition": [],
+                  "effect": "Allow",
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [],
+                  "resources": [
+                    "*"
+                  ],
+                  "sid": "SendTraces"
+                }
+              ],
+              "version": "2012-10-17"
+            },
+            "sensitive_values": {
+              "statement": [
+                {
+                  "actions": [
+                    false
+                  ],
+                  "condition": [],
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [],
+                  "resources": [
+                    false
+                  ]
+                },
+                {
+                  "actions": [
+                    false
+                  ],
+                  "condition": [],
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [],
+                  "resources": [
+                    false
+                  ]
+                },
+                {
+                  "actions": [
+                    false,
+                    false
+                  ],
+                  "condition": [],
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [],
+                  "resources": [
+                    false,
+                    false
+                  ]
+                },
+                {
+                  "actions": [
+                    false,
+                    false
+                  ],
+                  "condition": [],
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [],
+                  "resources": [
+                    false
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "address": "data.aws_iam_policy_document.trail_key",
+            "mode": "data",
+            "type": "aws_iam_policy_document",
+            "name": "trail_key",
+            "provider_name": "registry.terraform.io/hashicorp/aws",
+            "schema_version": 0,
+            "values": {
+              "id": "1198122533",
+              "json": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"AccountAdministration\",\n      \"Effect\": \"Allow\",\n      \"Action\": \"kms:*\",\n      \"Resource\": \"*\",\n      \"Principal\": {\n        \"AWS\": \"arn:aws:iam::111122223333:root\"\n      }\n    },\n    {\n      \"Sid\": \"CloudTrailEncryptLogs\",\n      \"Effect\": \"Allow\",\n      \"Action\": \"kms:GenerateDataKey*\",\n      \"Resource\": \"*\",\n      \"Principal\": {\n        \"Service\": \"cloudtrail.amazonaws.com\"\n      },\n      \"Condition\": {\n        \"StringEquals\": {\n          \"aws:SourceArn\": \"arn:aws:cloudtrail:us-east-1:111122223333:trail/acme-health-intake-trail\"\n        },\n        \"StringLike\": {\n          \"kms:EncryptionContext:aws:cloudtrail:arn\": \"arn:aws:cloudtrail:*:111122223333:trail/*\"\n        }\n      }\n    },\n    {\n      \"Sid\": \"CloudTrailDescribeKey\",\n      \"Effect\": \"Allow\",\n      \"Action\": \"kms:DescribeKey\",\n      \"Resource\": \"*\",\n      \"Principal\": {\n        \"Service\": \"cloudtrail.amazonaws.com\"\n      }\n    }\n  ]\n}",
+              "minified_json": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AccountAdministration\",\"Effect\":\"Allow\",\"Action\":\"kms:*\",\"Resource\":\"*\",\"Principal\":{\"AWS\":\"arn:aws:iam::111122223333:root\"}},{\"Sid\":\"CloudTrailEncryptLogs\",\"Effect\":\"Allow\",\"Action\":\"kms:GenerateDataKey*\",\"Resource\":\"*\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Condition\":{\"StringEquals\":{\"aws:SourceArn\":\"arn:aws:cloudtrail:us-east-1:111122223333:trail/acme-health-intake-trail\"},\"StringLike\":{\"kms:EncryptionContext:aws:cloudtrail:arn\":\"arn:aws:cloudtrail:*:111122223333:trail/*\"}}},{\"Sid\":\"CloudTrailDescribeKey\",\"Effect\":\"Allow\",\"Action\":\"kms:DescribeKey\",\"Resource\":\"*\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"}}]}",
+              "override_json": null,
+              "override_policy_documents": null,
+              "policy_id": null,
+              "source_json": null,
+              "source_policy_documents": null,
+              "statement": [
+                {
+                  "actions": [
+                    "kms:*"
+                  ],
+                  "condition": [],
+                  "effect": "Allow",
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [
+                    {
+                      "identifiers": [
+                        "arn:aws:iam::111122223333:root"
+                      ],
+                      "type": "AWS"
+                    }
+                  ],
+                  "resources": [
+                    "*"
+                  ],
+                  "sid": "AccountAdministration"
+                },
+                {
+                  "actions": [
+                    "kms:GenerateDataKey*"
+                  ],
+                  "condition": [
+                    {
+                      "test": "StringEquals",
+                      "values": [
+                        "arn:aws:cloudtrail:us-east-1:111122223333:trail/acme-health-intake-trail"
+                      ],
+                      "variable": "aws:SourceArn"
+                    },
+                    {
+                      "test": "StringLike",
+                      "values": [
+                        "arn:aws:cloudtrail:*:111122223333:trail/*"
+                      ],
+                      "variable": "kms:EncryptionContext:aws:cloudtrail:arn"
+                    }
+                  ],
+                  "effect": "Allow",
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [
+                    {
+                      "identifiers": [
+                        "cloudtrail.amazonaws.com"
+                      ],
+                      "type": "Service"
+                    }
+                  ],
+                  "resources": [
+                    "*"
+                  ],
+                  "sid": "CloudTrailEncryptLogs"
+                },
+                {
+                  "actions": [
+                    "kms:DescribeKey"
+                  ],
+                  "condition": [],
+                  "effect": "Allow",
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [
+                    {
+                      "identifiers": [
+                        "cloudtrail.amazonaws.com"
+                      ],
+                      "type": "Service"
+                    }
+                  ],
+                  "resources": [
+                    "*"
+                  ],
+                  "sid": "CloudTrailDescribeKey"
+                }
+              ],
+              "version": "2012-10-17"
+            },
+            "sensitive_values": {
+              "statement": [
+                {
+                  "actions": [
+                    false
+                  ],
+                  "condition": [],
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [
+                    {
+                      "identifiers": [
+                        false
+                      ]
+                    }
+                  ],
+                  "resources": [
+                    false
+                  ]
+                },
+                {
+                  "actions": [
+                    false
+                  ],
+                  "condition": [
+                    {
+                      "values": [
+                        false
+                      ]
+                    },
+                    {
+                      "values": [
+                        false
+                      ]
+                    }
+                  ],
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [
+                    {
+                      "identifiers": [
+                        false
+                      ]
+                    }
+                  ],
+                  "resources": [
+                    false
+                  ]
+                },
+                {
+                  "actions": [
+                    false
+                  ],
+                  "condition": [],
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [
+                    {
+                      "identifiers": [
+                        false
+                      ]
+                    }
+                  ],
+                  "resources": [
+                    false
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "address": "data.aws_iam_policy_document.trail_logs",
+            "mode": "data",
+            "type": "aws_iam_policy_document",
+            "name": "trail_logs",
+            "provider_name": "registry.terraform.io/hashicorp/aws",
+            "schema_version": 0,
+            "values": {
+              "id": "1077575890",
+              "json": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"CloudTrailAclCheck\",\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:GetBucketAcl\",\n      \"Resource\": \"arn:aws:s3:::acme-health-intake-trail-logs-5c657426\",\n      \"Principal\": {\n        \"Service\": \"cloudtrail.amazonaws.com\"\n      },\n      \"Condition\": {\n        \"StringEquals\": {\n          \"aws:SourceArn\": \"arn:aws:cloudtrail:us-east-1:111122223333:trail/acme-health-intake-trail\"\n        }\n      }\n    },\n    {\n      \"Sid\": \"CloudTrailWrite\",\n      \"Effect\": \"Allow\",\n      \"Action\": \"s3:PutObject\",\n      \"Resource\": \"arn:aws:s3:::acme-health-intake-trail-logs-5c657426/AWSLogs/111122223333/*\",\n      \"Principal\": {\n        \"Service\": \"cloudtrail.amazonaws.com\"\n      },\n      \"Condition\": {\n        \"StringEquals\": {\n          \"aws:SourceArn\": \"arn:aws:cloudtrail:us-east-1:111122223333:trail/acme-health-intake-trail\",\n          \"s3:x-amz-acl\": \"bucket-owner-full-control\"\n        }\n      }\n    },\n    {\n      \"Sid\": \"DenyInsecureTransport\",\n      \"Effect\": \"Deny\",\n      \"Action\": \"s3:*\",\n      \"Resource\": [\n        \"arn:aws:s3:::acme-health-intake-trail-logs-5c657426/*\",\n        \"arn:aws:s3:::acme-health-intake-trail-logs-5c657426\"\n      ],\n      \"Principal\": \"*\",\n      \"Condition\": {\n        \"Bool\": {\n          \"aws:SecureTransport\": \"false\"\n        }\n      }\n    }\n  ]\n}",
+              "minified_json": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"CloudTrailAclCheck\",\"Effect\":\"Allow\",\"Action\":\"s3:GetBucketAcl\",\"Resource\":\"arn:aws:s3:::acme-health-intake-trail-logs-5c657426\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Condition\":{\"StringEquals\":{\"aws:SourceArn\":\"arn:aws:cloudtrail:us-east-1:111122223333:trail/acme-health-intake-trail\"}}},{\"Sid\":\"CloudTrailWrite\",\"Effect\":\"Allow\",\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::acme-health-intake-trail-logs-5c657426/AWSLogs/111122223333/*\",\"Principal\":{\"Service\":\"cloudtrail.amazonaws.com\"},\"Condition\":{\"StringEquals\":{\"aws:SourceArn\":\"arn:aws:cloudtrail:us-east-1:111122223333:trail/acme-health-intake-trail\",\"s3:x-amz-acl\":\"bucket-owner-full-control\"}}},{\"Sid\":\"DenyInsecureTransport\",\"Effect\":\"Deny\",\"Action\":\"s3:*\",\"Resource\":[\"arn:aws:s3:::acme-health-intake-trail-logs-5c657426/*\",\"arn:aws:s3:::acme-health-intake-trail-logs-5c657426\"],\"Principal\":\"*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}}}]}",
+              "override_json": null,
+              "override_policy_documents": null,
+              "policy_id": null,
+              "source_json": null,
+              "source_policy_documents": null,
+              "statement": [
+                {
+                  "actions": [
+                    "s3:GetBucketAcl"
+                  ],
+                  "condition": [
+                    {
+                      "test": "StringEquals",
+                      "values": [
+                        "arn:aws:cloudtrail:us-east-1:111122223333:trail/acme-health-intake-trail"
+                      ],
+                      "variable": "aws:SourceArn"
+                    }
+                  ],
+                  "effect": "Allow",
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [
+                    {
+                      "identifiers": [
+                        "cloudtrail.amazonaws.com"
+                      ],
+                      "type": "Service"
+                    }
+                  ],
+                  "resources": [
+                    "arn:aws:s3:::acme-health-intake-trail-logs-5c657426"
+                  ],
+                  "sid": "CloudTrailAclCheck"
+                },
+                {
+                  "actions": [
+                    "s3:PutObject"
+                  ],
+                  "condition": [
+                    {
+                      "test": "StringEquals",
+                      "values": [
+                        "arn:aws:cloudtrail:us-east-1:111122223333:trail/acme-health-intake-trail"
+                      ],
+                      "variable": "aws:SourceArn"
+                    },
+                    {
+                      "test": "StringEquals",
+                      "values": [
+                        "bucket-owner-full-control"
+                      ],
+                      "variable": "s3:x-amz-acl"
+                    }
+                  ],
+                  "effect": "Allow",
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [
+                    {
+                      "identifiers": [
+                        "cloudtrail.amazonaws.com"
+                      ],
+                      "type": "Service"
+                    }
+                  ],
+                  "resources": [
+                    "arn:aws:s3:::acme-health-intake-trail-logs-5c657426/AWSLogs/111122223333/*"
+                  ],
+                  "sid": "CloudTrailWrite"
+                },
+                {
+                  "actions": [
+                    "s3:*"
+                  ],
+                  "condition": [
+                    {
+                      "test": "Bool",
+                      "values": [
+                        "false"
+                      ],
+                      "variable": "aws:SecureTransport"
+                    }
+                  ],
+                  "effect": "Deny",
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [
+                    {
+                      "identifiers": [
+                        "*"
+                      ],
+                      "type": "*"
+                    }
+                  ],
+                  "resources": [
+                    "arn:aws:s3:::acme-health-intake-trail-logs-5c657426",
+                    "arn:aws:s3:::acme-health-intake-trail-logs-5c657426/*"
+                  ],
+                  "sid": "DenyInsecureTransport"
+                }
+              ],
+              "version": "2012-10-17"
+            },
+            "sensitive_values": {
+              "statement": [
+                {
+                  "actions": [
+                    false
+                  ],
+                  "condition": [
+                    {
+                      "values": [
+                        false
+                      ]
+                    }
+                  ],
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [
+                    {
+                      "identifiers": [
+                        false
+                      ]
+                    }
+                  ],
+                  "resources": [
+                    false
+                  ]
+                },
+                {
+                  "actions": [
+                    false
+                  ],
+                  "condition": [
+                    {
+                      "values": [
+                        false
+                      ]
+                    },
+                    {
+                      "values": [
+                        false
+                      ]
+                    }
+                  ],
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [
+                    {
+                      "identifiers": [
+                        false
+                      ]
+                    }
+                  ],
+                  "resources": [
+                    false
+                  ]
+                },
+                {
+                  "actions": [
+                    false
+                  ],
+                  "condition": [
+                    {
+                      "values": [
+                        false
+                      ]
+                    }
+                  ],
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [
+                    {
+                      "identifiers": [
+                        false
+                      ]
+                    }
+                  ],
+                  "resources": [
+                    false,
+                    false
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "address": "data.aws_iam_policy_document.uploads_tls_only",
+            "mode": "data",
+            "type": "aws_iam_policy_document",
+            "name": "uploads_tls_only",
+            "provider_name": "registry.terraform.io/hashicorp/aws",
+            "schema_version": 0,
+            "values": {
+              "id": "976634050",
+              "json": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DenyInsecureTransport\",\n      \"Effect\": \"Deny\",\n      \"Action\": \"s3:*\",\n      \"Resource\": [\n        \"arn:aws:s3:::acme-health-intake-uploads-5c657426/*\",\n        \"arn:aws:s3:::acme-health-intake-uploads-5c657426\"\n      ],\n      \"Principal\": \"*\",\n      \"Condition\": {\n        \"Bool\": {\n          \"aws:SecureTransport\": \"false\"\n        }\n      }\n    }\n  ]\n}",
+              "minified_json": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"DenyInsecureTransport\",\"Effect\":\"Deny\",\"Action\":\"s3:*\",\"Resource\":[\"arn:aws:s3:::acme-health-intake-uploads-5c657426/*\",\"arn:aws:s3:::acme-health-intake-uploads-5c657426\"],\"Principal\":\"*\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}}}]}",
+              "override_json": null,
+              "override_policy_documents": null,
+              "policy_id": null,
+              "source_json": null,
+              "source_policy_documents": null,
+              "statement": [
+                {
+                  "actions": [
+                    "s3:*"
+                  ],
+                  "condition": [
+                    {
+                      "test": "Bool",
+                      "values": [
+                        "false"
+                      ],
+                      "variable": "aws:SecureTransport"
+                    }
+                  ],
+                  "effect": "Deny",
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [
+                    {
+                      "identifiers": [
+                        "*"
+                      ],
+                      "type": "*"
+                    }
+                  ],
+                  "resources": [
+                    "arn:aws:s3:::acme-health-intake-uploads-5c657426",
+                    "arn:aws:s3:::acme-health-intake-uploads-5c657426/*"
+                  ],
+                  "sid": "DenyInsecureTransport"
+                }
+              ],
+              "version": "2012-10-17"
+            },
+            "sensitive_values": {
+              "statement": [
+                {
+                  "actions": [
+                    false
+                  ],
+                  "condition": [
+                    {
+                      "values": [
+                        false
+                      ]
+                    }
+                  ],
+                  "not_actions": [],
+                  "not_principals": [],
+                  "not_resources": [],
+                  "principals": [
+                    {
+                      "identifiers": [
+                        false
+                      ]
+                    }
+                  ],
+                  "resources": [
+                    false,
+                    false
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}
