@@ -7,7 +7,22 @@
 ######################################################################
 
 terraform {
-  required_version = ">= 1.6"
+  # use_lockfile in the backend below needs Terraform 1.10 or newer.
+  required_version = ">= 1.10"
+
+  # State lives in the bucket from state-bucket.tf so that the pipeline, which runs on a
+  # runner that is thrown away after every run, sees the same state as I do. A backend
+  # block cannot use variables or locals, so the bucket name is written out. Locking uses
+  # a lock file in the bucket, so no DynamoDB table is needed.
+  backend "s3" {
+    bucket       = "acme-health-intake-tfstate-5c657426"
+    key          = "capstone/terraform.tfstate"
+    region       = "us-east-1"
+    encrypt      = true
+    kms_key_id   = "arn:aws:kms:us-east-1:650251713518:key/79595907-b17c-40fc-9cd1-a044e7eaa273"
+    use_lockfile = true
+  }
+
   required_providers {
     aws     = { source = "hashicorp/aws", version = "~> 5.0" }
     random  = { source = "hashicorp/random", version = "~> 3.6" }
