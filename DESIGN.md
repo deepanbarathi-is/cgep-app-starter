@@ -94,7 +94,8 @@ I also add cross-references to SOC 2 and CMMC controls in `props` on the relevan
 - The pipeline applies automatically on merge to main, after the policy gate passes. This is fully continuous, but it gives the pipeline real deploy power, so I'm limiting the risk with branch protection, a required status check, and an OIDC role scoped to this repository.
 - Everything runs in one AWS account, my sandbox. For production the evidence vault would live in a separate account, so a compromise of the audited account could not quietly rewrite the evidence.
 - I close each gap in Terraform and use Rego to stop it coming back.
-- The capstone overview says the capstone vault is Lab 2.5's vault. I read that as the same design, not the same bucket. The Layer 1 list asks for a KMS-encrypted vault defined in this repo's Terraform, and my Lab 2.5 bucket lives in another repo and uses SSE-S3, so I rebuilt the vault here from the lab's pattern and left the old bucket untouched. It holds the signed bundles from Lab 4.4, so I'm not deleting it before the capstone is reviewed.
+- The capstone overview says the capstone vault is Lab 2.5's vault. I read that as the same design, not the same bucket: the Layer 1 list asks for a KMS-encrypted vault defined in this repo's Terraform, and my Lab 2.5 bucket lives in another repo and uses SSE-S3. So I rebuilt the vault here from the lab's pattern and left the old bucket alone. It holds the signed bundles from Lab 4.4, so I'm keeping it until the capstone pipeline has uploaded and verified a bundle in the new vault. Then I'll remove it, after checking that my labs repo holds its own copy of that evidence. It has no `force_destroy`, so every object version has to be emptied first.
+- I'm assuming graders will not have access to my AWS account, and the vault is private, so verification cannot depend on downloading from it. The pipeline uploads the signed bundle to the vault and records the Object Lock retention it saw (mode, retain-until date, and version ID) in `receipt.json`. I commit one signed sample bundle, its SHA-256, and that receipt in a tracked folder, because the starter's `.gitignore` ignores `evidence/`. The README gives a SHA check and a `cosign verify-blob` command that needs only the bundle and the public Rekor log. `verify-evidence.sh` checks live retention when the reader has credentials and falls back to the receipt when they do not. I can't be sure how the graders check retention, so I'll say that in the write-up.
 - I applied the Layer 1 baseline once by hand from the feature branch, in small chunks, testing each before the next: the workload gaps first, then the vault, then CloudTrail, then monitoring. The brief says not to start the pipeline until the baseline applies clean, and small chunks meant a failure pointed at a few resources instead of forty.
 - The write-up will run about five pages, built from this doc, with a control-to-code coverage table and an honest list of what I didn't get to.
 
@@ -102,13 +103,14 @@ I also add cross-references to SOC 2 and CMMC controls in `props` on the relevan
 
 - I added a LICENSE file (MIT), matching what the starter's README already claims but never actually shipped.
 - I'm committing `.terraform.lock.hcl` for this project so dependencies stay pinned, since that's explicitly called out in the grading rubric.
-- For state management, I'm using local Terraform state deliberately, documenting it as a single-developer, short-timeline trade-off rather than standing up a remote S3 and DynamoDB backend just to satisfy that one rubric line.
+- State lives in an S3 backend that uses S3's native lockfile (`use_lockfile`) for locking. Local state would work for one person, but the pipeline applies on merge from a runner that is thrown away after every run. That runner would not know what already exists, and its second run would collide with the first: my trail name is fixed, and AWS allows only one Config recorder per region. `use_lockfile` needs Terraform 1.10 or newer, so I'll raise `required_version` from 1.6, and I'm not building a DynamoDB lock table. I'll create the state bucket with the same module as my other buckets and migrate the local state up once with `terraform init -migrate-state` when I build Layer 3.
+- The rubric lists automatic fails for a private repo, secrets or PII in the repo, and a missing README. The repo is public, my alert address sits in a gitignored `terraform.tfvars`, and I'll run gitleaks and write the short grader README before I submit.
 
 ## CI/CD pipeline, expanded stages, still one workflow
 
 `lint → validate → security scan (checkov + tfsec) → gitleaks → policy check (Conftest) → apply → sign (Cosign) → upload (vault)`
 
-This is wider than the bare 5 steps described in the brief, matching what the rubric explicitly checks for in CI. It runs on pull requests against main. I'll wire branch protection (require a PR, no bypass, a required status check) once this workflow exists and I have a real job name to point it at.
+This is wider than the bare 5 steps described in the brief, matching what the rubric explicitly checks for in CI. It runs on pull requests against main, and I keep the plan JSON and the signed bundle as workflow artifacts, since the rubric's top tier asks for artifacts to be preserved. I'll wire branch protection (require a PR, no bypass, a required status check) once this workflow exists and I have a real job name to point it at.
 
 The repo history will show two pull requests: one green PR that merges, and one red PR that deliberately reintroduces a gap and is blocked by the gate. I'll choose which gap when I build the pipeline.
 
@@ -122,7 +124,7 @@ The repo history will show two pull requests: one green PR that merges, and one 
 
 `terraform fmt -check`, `tflint`, `checkov`, `gitleaks`, `semgrep --config=auto`, and `opa test ./policies`, fixing anything HIGH or CRITICAL. I'm treating this as insurance rather than the main scoring lever: end-to-end integration and clear reasoning matter more, but this is cheap to run and catches real problems before submission.
 
-## What I'm deliberately not doing, honest and stated
+## What I'm deliberately not doing
 
 - GAP-06's DLQ, since synchronous invocation makes it non-functional here.
 - GAP-06's reserved concurrency, since this account's Lambda concurrency limit of 10 leaves nothing to reserve (AWS requires 100 to stay unreserved). API Gateway throttling is the compensating control.
@@ -130,7 +132,7 @@ The repo history will show two pull requests: one green PR that merges, and one 
 - A Config rule for GAP-07, since AWS's managed IAM rules don't evaluate inline policies.
 - CloudTrail data events for S3 and DynamoDB. They would record every object and item access, which is closer to what an auditor wants for PHI, but they are billed per event and the trail's management events already cover who changed what.
 - Recording every Config resource type. I record only the four the rules use.
-- A remote Terraform state backend: a documented choice, not something I built.
+- A DynamoDB table for state locking, since S3's native lockfile does the same job for a single developer.
 - Automated retry and dead-letter handling on the evidence pipeline itself, which I'm noting as a "with another sprint" item.
 
 ## Open decisions
