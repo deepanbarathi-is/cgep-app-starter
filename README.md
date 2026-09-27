@@ -8,7 +8,7 @@ None of these need an AWS account. Run from the repo root.
 
 ```bash
 opa test ./policies                          # 57 unit tests across the 5 policies
-test/policy-breaks.sh                        # the gate blocks 7 real deliberate breaks, one per gap
+test/policy-breaks.sh                        # the gate blocks 7 real deliberate breaks across the 5 flagship gaps
 test/plan-guard-breaks.sh                    # the empty-plan guard rejects a malformed plan
 test/verify-evidence-breaks.sh               # the evidence verifier catches 5 kinds of tampering
 scripts/verify-evidence.sh --dir evidence-samples/run-36292858361
@@ -53,7 +53,7 @@ WRITEUP.md           the required write-up
 
 ## Cost and cleanup
 
-Roughly $0 if destroyed promptly. The six KMS keys are the only thing billed while idle, at about a dollar each per month. `make destroy` removes the deployed workload; the state bucket, the OIDC roles, and the evidence vault are separate Terraform resources in `terraform/` and would need their own destroy pass, in that order, since the state bucket holds the state for everything else.
+Roughly $0 if destroyed promptly. The seven KMS keys are the only thing billed while idle, at about a dollar each per month. `make destroy` removes the deployed workload; the state bucket, the OIDC roles, and the evidence vault are separate Terraform resources in `terraform/` and would need their own destroy pass, in that order, since the state bucket holds the state for everything else.
 
 ## License
 
