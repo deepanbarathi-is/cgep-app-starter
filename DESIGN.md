@@ -84,9 +84,17 @@ The policies read `resource_changes`, the flat list of every resource in the pla
 
 ## OSCAL component (Layer 4)
 
-One `component-definition.json` describing what I actually built: implemented-requirements for the gaps I closed (GAP-01 to 05 and 07, and optionally the partial fixes), real Terraform addresses as props, HIPAA 164.x citations as props, and evidence links to a real signed bundle in my vault. A profile selects the controls the component implements. Anything I did not build, such as the DLQ and the WAF, is not claimed in OSCAL and appears only in WRITEUP.md.
+The brief is specific here: `control-implementation.source` has to point at my declared framework's catalog, and my declared framework is HIPAA, not NIST 800-53. NIST publishes no OSCAL catalog for the HIPAA Security Rule, so pointing `source` at 800-53 the way Lab 6.1 did would name the wrong framework's catalog, since Lab 6.1's declared framework was 800-53 itself. I wrote my own small catalog instead: `oscal/catalogs/hipaa-164-subset/catalog.json`, five controls covering exactly the sections my Rego policies already cite, with SP 800-66 Rev. 2 named as the reference in its metadata.
 
-I also add cross-references to SOC 2 and CMMC controls in `props` on the relevant implemented-requirements, for example SOC 2 CC7.2 and CMMC SI.L2-3.14.6 for the GAP-06 partial fix. HIPAA remains the only framework in the policies, the profile, and the component's source.
+OSCAL control identifiers can't contain parentheses or start with a digit, so `164.312(a)(2)(iv)` isn't a legal id on its own. I wrote each id as a token form of the citation (`hipaa-164.312-a-2-iv`), the same move NIST 800-53 itself makes by writing `AC-3` as `ac-3`. The real citation, with its parentheses, still appears verbatim in the control's title, its statement text, and a `hipaa-citation` property, and again on every `implemented-requirement` in the component, so nothing is invented and the citation is never hidden behind the id.
+
+`oscal/components/acme-health-intake/component-definition.json` has eight implemented-requirements: GAP-01, 02, 03, 05, and 07 (matching my five Rego policies), GAP-04 (versioning and DynamoDB point-in-time recovery), CloudTrail, and the evidence vault's Object Lock. Each one carries the real Terraform address as a `terraform-resource` prop and a link to a real signed bundle in the vault. I checked every address against `terraform state list` on the live account, and the evidence link, before committing the file. Anything I did not build, such as the DLQ and the WAF, is not claimed in OSCAL and appears only in WRITEUP.md.
+
+`oscal/profiles/hipaa-minimum/profile.json` selects the five catalog controls the component implements. I resolved it with `trestle author profile-resolve` and confirmed all five come through.
+
+`trestle validate -f` expects a fixed folder name, `component-definitions`, and won't accept `oscal/components/`, the path the brief names literally. I validate with `trestle partial-object-validate -tr . -f <path> -e <type>` instead, which checks the same schema without caring what the folder is called. A `.trestle/config.ini` marker is committed at the repo root so this is reproducible by anyone who clones the repo, not just on my machine.
+
+I also add cross-references to SOC 2 and CMMC controls in `props` on the relevant implemented-requirements, for example SOC 2 CC6.1 and CMMC SC.L2-3.13.11 on the encryption requirements. Those are carried from this document's own reasoning and haven't been checked against anything live, unlike the HIPAA citations and the Terraform addresses. HIPAA remains the only framework in the policies, the profile, and the component's source.
 
 ## Decisions and trade-offs
 
@@ -110,11 +118,13 @@ I also add cross-references to SOC 2 and CMMC controls in `props` on the relevan
 
 ## CI/CD pipeline, expanded stages, still one workflow
 
-`lint → validate → security scan (checkov + tfsec) → gitleaks → policy check (Conftest) → apply → sign (Cosign) → upload (vault)`
+`gitleaks → checkov → fmt → opa test → break tests → plan (read-only role) → empty-plan guard → policy gate (Conftest) → apply (apply role, merge to main only) → build the evidence bundle → sign with Cosign → upload to the vault`
 
-This is wider than the bare 5 steps described in the brief, matching what the rubric explicitly checks for in CI. It runs on pull requests against main, and I keep the plan JSON and the signed bundle as workflow artifacts, since the rubric's top tier asks for artifacts to be preserved. I'll wire branch protection (require a PR, no bypass, a required status check) once this workflow exists and I have a real job name to point it at.
+This is wider than the bare five steps in the brief, matching what the rubric checks for in CI. `tfsec` dropped off the list: I'd carried it over from my own Lab 4.3 pipeline without checking whether the capstone asked for it, and it doesn't, so `checkov` alone covers that ground. The scanners and the offline checks run first, before anything touches AWS, so a bad commit never gets as far as logging in.
 
-The repo history will show two pull requests: one green PR that merges, and one red PR that deliberately reintroduces a gap and is blocked by the gate. I'll choose which gap when I build the pipeline.
+Pull requests get a read-only AWS role and can only plan; a merge to main gets a separate role and applies the exact plan the gate just checked, then builds, signs, and uploads the evidence. Neither role can change the other's permissions or trust, so the pipeline can't grant itself more access. Branch protection is on: a pull request is required, the plan-and-gate check must pass, and there's no bypass for administrators. I keep the redacted plan and the signed bundle as workflow artifacts.
+
+The repo history shows ten merged pull requests plus one closed without merging: that one adds a bucket with no TLS-deny policy, on purpose, and the run log shows the policy gate failing it and the merge button disabled by branch protection.
 
 ## Testing strategy
 
@@ -139,10 +149,10 @@ The repo history will show two pull requests: one green PR that merges, and one 
 - A DynamoDB table for state locking, since S3's native lockfile does the same job for a single developer.
 - Automated retry and dead-letter handling on the evidence pipeline itself, which I'm noting as a "with another sprint" item.
 
-## Open decisions
+## Decisions that were open earlier, now settled
 
-- The OSCAL catalog for HIPAA is still open. NIST publishes OSCAL catalogs for SP 800-53 and SP 800-171, but none for HIPAA or SP 800-66 (I checked the usnistgov/oscal-content repository). The starter's FRAMEWORKS.md suggests citing SP 800-66 Rev. 2 as the catalog and putting the 164.x sections in `props`. I haven't decided how the component's `control-implementation.source` and the profile will point at it, and I'll settle that before building this layer.
-- The pass threshold is also unsettled. The live rubric gives it as 65 in its header and 80 in its body, and the Capstone Overview PDF (also v1.1.0) says 65. I'm designing to the stricter 80 until that's clear.
+- The OSCAL catalog for HIPAA. Settled by authoring my own small catalog rather than citing NIST 800-53, as the OSCAL component section above explains.
+- The pass threshold. The live rubric states it plainly: weighted average of 80 or higher, with no auto-fail triggers. I designed to that figure from the start, so nothing changes.
 
 ## Requirements sources and how I ranked them
 
