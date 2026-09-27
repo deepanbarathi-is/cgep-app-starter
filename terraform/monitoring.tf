@@ -160,6 +160,9 @@ resource "aws_config_config_rule" "managed" {
 # to an SNS topic (HIPAA 164.312(b)). The topic uses its own key because the AWS-managed
 # SNS key does not let EventBridge publish.
 data "aws_iam_policy_document" "alerts_key" {
+  # checkov:skip=CKV_AWS_109:The account administration statement is the standard KMS key policy for the account root. Every key needs one, and it is what lets IAM policies grant access to the key.
+  # checkov:skip=CKV_AWS_111:The account administration statement is the standard KMS key policy for the account root. Every key needs one, and it is what lets IAM policies grant access to the key.
+  # checkov:skip=CKV_AWS_356:The account administration statement is the standard KMS key policy for the account root. Every key needs one, and it is what lets IAM policies grant access to the key.
   statement {
     sid       = "AccountAdministration"
     actions   = ["kms:*"]

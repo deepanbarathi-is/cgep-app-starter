@@ -73,6 +73,63 @@ test_unknown_policy_text_fails if {
 	contains(msg, "not known at plan time")
 }
 
+# An unreadable policy whose text comes from a policy document that Terraform still shows.
+unreadable_policy_with_document(actions_list, effect) := {
+	"resource_changes": [
+		{
+			"address": "aws_iam_role_policy.later",
+			"type": "aws_iam_role_policy",
+			"change": {"actions": ["update"], "after": {"name": "x"}, "after_unknown": {"policy": true}},
+		},
+		{
+			"address": "data.aws_iam_policy_document.doc",
+			"mode": "data",
+			"type": "aws_iam_policy_document",
+			"change": {"actions": ["read"], "after": {"statement": [{"sid": "Doc", "effect": effect, "actions": actions_list, "not_actions": []}]}},
+		},
+	],
+	"configuration": {"root_module": {"resources": [{
+		"address": "aws_iam_role_policy.later",
+		"type": "aws_iam_role_policy",
+		"expressions": {"policy": {"references": ["data.aws_iam_policy_document.doc.json", "data.aws_iam_policy_document.doc"]}},
+	}]}},
+}
+
+test_unreadable_policy_with_safe_document_passes if {
+	plan := unreadable_policy_with_document(["s3:PutObject"], null)
+	count(iam_least_privilege.deny) == 0 with input as plan
+}
+
+test_unreadable_policy_with_wildcard_document_fails if {
+	plan := unreadable_policy_with_document(["s3:*"], null)
+	some msg in iam_least_privilege.deny with input as plan
+	contains(msg, "aws_iam_role_policy.later")
+	contains(msg, "s3:*")
+}
+
+test_unreadable_policy_with_deny_wildcard_document_passes if {
+	plan := unreadable_policy_with_document(["s3:*"], "Deny")
+	count(iam_least_privilege.deny) == 0 with input as plan
+}
+
+test_unreadable_policy_with_document_from_prior_state_is_checked if {
+	plan := {
+		"resource_changes": [{
+			"address": "aws_iam_role_policy.later",
+			"type": "aws_iam_role_policy",
+			"change": {"actions": ["update"], "after": {"name": "x"}, "after_unknown": {"policy": true}},
+		}],
+		"prior_state": {"values": {"root_module": {"resources": [{"address": "data.aws_iam_policy_document.doc", "values": {"statement": [{"sid": "Old", "effect": "Allow", "actions": ["*"], "not_actions": []}]}}]}}},
+		"configuration": {"root_module": {"resources": [{
+			"address": "aws_iam_role_policy.later",
+			"type": "aws_iam_role_policy",
+			"expressions": {"policy": {"references": ["data.aws_iam_policy_document.doc.json"]}},
+		}]}},
+	}
+	some msg in iam_least_privilege.deny with input as plan
+	contains(msg, "wildcard action")
+}
+
 test_deleted_policy_is_ignored if {
 	plan := {"resource_changes": [{
 		"address": "aws_iam_role_policy.old",

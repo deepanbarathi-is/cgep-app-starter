@@ -78,7 +78,7 @@ Five Rego policies, one per flagship gap, each in its own file under `policies/`
 - GAP-05: every Lambda function must have a `vpc_config`
 - GAP-07: no identity policy may allow `*` or a service-wide wildcard action such as `s3:*`
 
-Each policy carries a `# METADATA` block naming the framework (`hipaa`), the HIPAA control ID, a severity, the gap, and a remediation. The deny message includes the control ID, so a developer reading a failed PR sees the exact citation. Each policy has its own `_test.rego` with passing and failing cases, 53 in total.
+Each policy carries a `# METADATA` block naming the framework (`hipaa`), the HIPAA control ID, a severity, the gap, and a remediation. The deny message includes the control ID, so a developer reading a failed PR sees the exact citation. Each policy has its own `_test.rego` with passing and failing cases, 57 in total.
 
 The policies read `resource_changes`, the flat list of every resource in the plan, because my S3 hardening lives inside a module and a policy that only read the root module would miss it. They fail closed: a missing block or an unreadable policy is denied, not assumed safe. Resources that a plan is deleting are ignored. Three of them needed a second way to work when a value is not known until apply (the GAP-01 policy counts new buckets against new encryption configurations, the GAP-03 policy follows the code from bucket to policy to policy document, and the GAP-07 policy denies policy text it cannot read). `policies/README.md` lists what each policy does not cover, including the fact that a resource created outside Terraform never appears in a plan, which is why the Config rules exist. Conftest runs the suite against the Terraform plan JSON in the pipeline.
 

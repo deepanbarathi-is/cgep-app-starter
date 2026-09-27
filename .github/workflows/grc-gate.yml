@@ -29,6 +29,8 @@ env:
   TERRAFORM_VERSION: "1.16.1"
   OPA_VERSION: "1.19.0"
   CONFTEST_VERSION: "0.70.1"
+  GITLEAKS_VERSION: "8.30.1"
+  CHECKOV_VERSION: "3.3.10"
   TF_IN_AUTOMATION: "true"
 
 jobs:
@@ -39,6 +41,8 @@ jobs:
     steps:
       - name: Check out the code
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v4
@@ -51,7 +55,7 @@ jobs:
         with:
           cosign-release: v3.1.3
 
-      - name: Install OPA and Conftest
+      - name: Install OPA, Conftest and gitleaks
         run: |
           mkdir -p "$HOME/bin"
           curl -fsSL -o "$HOME/bin/opa" \
@@ -60,7 +64,22 @@ jobs:
           curl -fsSL \
             "https://github.com/open-policy-agent/conftest/releases/download/v${CONFTEST_VERSION}/conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz" \
             | tar -xz -C "$HOME/bin" conftest
+          curl -fsSL \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+            | tar -xz -C "$HOME/bin" gitleaks
           echo "$HOME/bin" >> "$GITHUB_PATH"
+
+      # A secret in a public repository is an automatic fail, so this blocks. It scans the
+      # whole git history, not only the current files.
+      - name: Scan for secrets (gitleaks)
+        run: gitleaks detect --source . --no-banner --redact
+
+      # Every finding was reviewed. The ones that are accepted carry a checkov:skip comment
+      # with the reason next to the code, so any new finding fails the build.
+      - name: Scan the Terraform (checkov)
+        run: |
+          pip install --quiet "checkov==${CHECKOV_VERSION}"
+          checkov --config-file .checkov.yaml
 
       - name: Check Terraform formatting
         working-directory: terraform

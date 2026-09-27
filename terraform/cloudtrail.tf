@@ -11,6 +11,9 @@ locals {
 # The key the trail and its bucket use. The module's key cannot serve here because
 # CloudTrail is a service principal and needs its own statement in the key policy.
 data "aws_iam_policy_document" "trail_key" {
+  # checkov:skip=CKV_AWS_109:The account administration statement is the standard KMS key policy for the account root. Every key needs one, and it is what lets IAM policies grant access to the key.
+  # checkov:skip=CKV_AWS_111:The account administration statement is the standard KMS key policy for the account root. Every key needs one, and it is what lets IAM policies grant access to the key.
+  # checkov:skip=CKV_AWS_356:The account administration statement is the standard KMS key policy for the account root. Every key needs one, and it is what lets IAM policies grant access to the key.
   statement {
     sid       = "AccountAdministration"
     actions   = ["kms:*"]
@@ -174,6 +177,7 @@ resource "aws_s3_bucket_policy" "trail_logs" {
 # HIPAA 164.312(b): record account activity in every region, with log-file validation
 # so a changed or deleted log file can be detected afterwards.
 resource "aws_cloudtrail" "main" {
+  # checkov:skip=CKV_AWS_252:Alerting runs through AWS Config rules and EventBridge, see monitoring.tf.
   name                          = local.trail_name
   s3_bucket_name                = aws_s3_bucket.trail_logs.id
   is_multi_region_trail         = true

@@ -11,10 +11,10 @@ HIPAA Security Rule is my primary framework, so every policy cites a HIPAA contr
 | `hipaa_312e1_lambda_vpc.rego` | GAP-05 | 164.312(e)(1) | A Lambda function with no `vpc_config` | 5 |
 | `hipaa_312a2iv_dynamodb_cmk.rego` | GAP-02 | 164.312(a)(2)(iv) | A DynamoDB table not encrypted with a customer-managed key | 8 |
 | `hipaa_312a2iv_s3_kms.rego` | GAP-01 | 164.312(a)(2)(iv) | An S3 bucket whose default encryption is not SSE-KMS with a customer-managed key, or that has none | 10 |
-| `hipaa_312a1_iam_least_privilege.rego` | GAP-07 | 164.312(a)(1) | An identity policy that allows `*` or a service-wide wildcard like `s3:*` | 12 |
+| `hipaa_312a1_iam_least_privilege.rego` | GAP-07 | 164.312(a)(1) | An identity policy that allows `*` or a service-wide wildcard like `s3:*` | 16 |
 | `hipaa_312e1_s3_tls_only.rego` | GAP-03 | 164.312(e)(1) | A bucket with no policy that denies requests not using TLS | 18 |
 
-The tests live in `tests/`, one file per policy, with passing and failing cases for each. There are 53 in total.
+The tests live in `tests/`, one file per policy, with passing and failing cases for each. There are 57 in total.
 
 ## How the policies read the plan
 
@@ -30,7 +30,7 @@ Some values are not known until apply, for example the ARN of a key created in t
 
 - The GAP-01 and GAP-02 policies accept an unknown key ARN, because the block exists and the key will be real at apply. They still deny a block that names no key at all.
 - The GAP-03 policy reads the bucket policy text when it can. When the bucket or its text is not known yet, it follows the code instead: bucket, then policy, then the policy document that holds the Deny statement. It never lets that fallback approve a policy it could read and found wrong.
-- The GAP-07 policy denies an identity policy whose text is not known, because it cannot check what it cannot read.
+- The GAP-07 policy reads the policy text when it can. When the text is not known yet, it follows the code to the policy document the text is built from and checks that document's statements. It denies a policy that has neither readable text nor a document to follow, because it cannot check what it cannot read.
 
 ## Running them
 
@@ -68,6 +68,6 @@ There are seven cases: a Lambda outside the VPC, a DynamoDB table on the default
 
 - They only see what goes through Terraform. A bucket someone creates by hand in the console never appears in a plan, so these policies cannot stop it. The AWS Config rules in `terraform/monitoring.tf` are the detective control for that case.
 - The GAP-01 policy cannot match a bucket that is being created to its encryption configuration by name, because the name does not exist yet. It checks that each new bucket has its own new encryption configuration in the same plan, which proves the counts line up but not which one belongs to which.
-- The GAP-07 policy checks action wildcards only. It does not judge whether a resource scope is too wide, and it skips AWS-managed policies such as `AWSLambdaBasicExecutionRole`. On a plan built from an empty state it denies the role policies, because their text is not known yet. That only matters for a first-ever apply, and the pipeline runs against existing state.
+- The GAP-07 policy checks action wildcards only. It does not judge whether a resource scope is too wide, and it skips AWS-managed policies such as `AWSLambdaBasicExecutionRole`. Following the code to a policy document works for policies in the root module. A policy built with `jsonencode` whose text is unknown has no document to follow and is denied.
 - The GAP-03 fallback that follows the code looks at policies in the root module. A bucket policy inside a module is still checked when its text is known.
 - GAP-04, GAP-06, and GAP-08 have no Rego policy. GAP-04 is covered by Terraform and a Config rule, and GAP-06 and GAP-08 are closed only in part, which `DESIGN.md` explains.
