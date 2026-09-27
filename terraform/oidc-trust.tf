@@ -153,8 +153,9 @@ data "aws_iam_policy_document" "pipeline_apply_iam" {
   }
 
   # Terraform reads every IAM object it manages, including the pipeline's own, on each run.
+  # The reads are limited to this project's roles and to the GitHub OIDC provider.
   statement {
-    sid = "ReadIam"
+    sid = "ReadProjectRoles"
     actions = [
       "iam:GetRole",
       "iam:GetRolePolicy",
@@ -162,10 +163,17 @@ data "aws_iam_policy_document" "pipeline_apply_iam" {
       "iam:ListAttachedRolePolicies",
       "iam:ListRoleTags",
       "iam:ListInstanceProfilesForRole",
+    ]
+    resources = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/acme-health-*"]
+  }
+
+  statement {
+    sid = "ReadGithubProvider"
+    actions = [
       "iam:GetOpenIDConnectProvider",
       "iam:ListOpenIDConnectProviderTags",
     ]
-    resources = ["*"]
+    resources = [aws_iam_openid_connect_provider.github.arn]
   }
 }
 

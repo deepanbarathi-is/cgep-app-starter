@@ -36,6 +36,7 @@ resource "aws_security_group" "lambda" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "lambda_to_s3" {
+  description       = "HTTPS from the Lambda to the S3 gateway endpoint"
   security_group_id = aws_security_group.lambda.id
   prefix_list_id    = aws_vpc_endpoint.s3.prefix_list_id
   ip_protocol       = "tcp"
@@ -44,6 +45,7 @@ resource "aws_vpc_security_group_egress_rule" "lambda_to_s3" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "lambda_to_dynamodb" {
+  description       = "HTTPS from the Lambda to the DynamoDB gateway endpoint"
   security_group_id = aws_security_group.lambda.id
   prefix_list_id    = aws_vpc_endpoint.dynamodb.prefix_list_id
   ip_protocol       = "tcp"

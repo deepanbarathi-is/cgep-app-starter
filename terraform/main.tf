@@ -70,6 +70,7 @@ resource "aws_vpc" "main" {
 }
 
 resource "aws_subnet" "public" {
+  # checkov:skip=CKV_AWS_130:The starter's public subnets. Nothing runs in them; the Lambda is in the private subnets (GAP-05).
   count                   = 2
   vpc_id                  = aws_vpc.main.id
   cidr_block              = "10.42.${count.index}.0/24"
@@ -120,6 +121,12 @@ resource "aws_dynamodb_table" "intake" {
   name         = "${local.name_prefix}-submissions-${local.suffix}"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "submission_id"
+
+  # HIPAA 164.308(a)(7) (contingency plan): the table can be restored to any second in
+  # the last 35 days, the same recovery idea as versioning on the S3 buckets.
+  point_in_time_recovery {
+    enabled = true
+  }
 
   attribute {
     name = "submission_id"
@@ -221,6 +228,10 @@ resource "aws_iam_role_policy" "lambda_inline" {
 
 
 resource "aws_lambda_function" "intake" {
+  # checkov:skip=CKV_AWS_115:Reserved concurrency is not possible here. This account's total Lambda concurrency limit is 10 (GAP-06, see DESIGN.md). API Gateway throttling is the compensating control.
+  # checkov:skip=CKV_AWS_116:The function is invoked synchronously through API Gateway, so a dead-letter queue would never receive an event (GAP-06, see DESIGN.md).
+  # checkov:skip=CKV_AWS_173:The environment variables hold only the table and bucket names, no PHI.
+  # checkov:skip=CKV_AWS_272:Code signing is not one of the eight gaps and is out of scope for this project.
   function_name    = "${local.name_prefix}-handler-${local.suffix}"
   role             = aws_iam_role.lambda.arn
   handler          = "handler.handler"
@@ -282,6 +293,7 @@ resource "aws_apigatewayv2_integration" "lambda" {
 }
 
 resource "aws_apigatewayv2_route" "intake" {
+  # checkov:skip=CKV_AWS_309:The starter's intake endpoint is public by design. API authentication is not one of the eight gaps, and the write-up lists it as not addressed.
   api_id    = aws_apigatewayv2_api.intake.id
   route_key = "POST /intake"
   target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
