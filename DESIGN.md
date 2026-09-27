@@ -120,6 +120,7 @@ The repo history will show two pull requests: one green PR that merges, and one 
 
 - Rego `_test.rego` fixtures with positive and negative cases, one set per flagship policy.
 - `test/policy-breaks.sh`: an integration test for the whole gate. It takes a real baseline plan that passes, breaks it in seven specific ways with `jq`, and requires Conftest to reject each one with the right gap and resource. It also requires the untouched plan to pass, so a gate that rejects everything cannot slip through.
+- `test/plan-guard-breaks.sh`: proves the pipeline's empty-plan guard, one `jq` line that runs before the policy gate, rejects an empty, missing, or malformed `resource_changes` field and a file that is not JSON, and still accepts a real plan.
 - `scripts/verify-controls.sh`: integration-level runtime checks against real deployed resources (a non-TLS S3 request that expects `AccessDenied`, confirming the real IAM role has no wildcard actions, confirming the real KMS key is attached to S3 and DynamoDB).
 - `scripts/verify-evidence.sh`: chain-of-custody verification on the signed bundle (integrity, authenticity, and retention checks).
 
