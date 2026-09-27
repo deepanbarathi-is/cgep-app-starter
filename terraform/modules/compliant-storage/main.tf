@@ -1,5 +1,13 @@
 # Hardens one existing S3 bucket. The module never creates the bucket itself.
 
+terraform {
+  required_version = ">= 1.10"
+
+  required_providers {
+    aws = { source = "hashicorp/aws", version = "~> 5.0" }
+  }
+}
+
 # HIPAA 164.312(a)(1), 164.312(a)(2)(iv): customer-managed key with rotation,
 # so key access is under my control and every use shows up in CloudTrail.
 resource "aws_kms_key" "this" {
