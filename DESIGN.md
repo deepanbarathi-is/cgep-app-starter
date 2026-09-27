@@ -133,6 +133,7 @@ The repo history shows ten merged pull requests plus one closed without merging:
 - `test/plan-guard-breaks.sh`: proves the pipeline's empty-plan guard, one `jq` line that runs before the policy gate, rejects an empty, missing, or malformed `resource_changes` field and a file that is not JSON, and still accepts a real plan.
 - `scripts/verify-controls.sh`: integration-level runtime checks against real deployed resources (a non-TLS S3 request that expects `AccessDenied`, confirming the real IAM role has no wildcard actions, confirming the real KMS key is attached to S3 and DynamoDB).
 - `scripts/verify-evidence.sh`: chain-of-custody verification on the signed bundle (integrity, authenticity, and retention checks).
+- `test/verify-evidence-breaks.sh`: proves that checker actually catches tampering, not just that it passes a clean bundle. It mutates a copy of the committed sample bundle five different ways (a changed byte, a swapped signature, a mismatched receipt, and so on) and requires every one to fail.
 
 ## Pre-submission tool pass, run once before shipping
 

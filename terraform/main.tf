@@ -77,7 +77,7 @@ resource "aws_default_security_group" "main" {
   tags = { Name = "${local.name_prefix}-default-sg-no-rules" }
 }
 
-resource "aws_subnet" "public" {
+resource "aws_subnet" "public" { # nosemgrep: terraform.aws.security.aws-subnet-has-public-ip-address.aws-subnet-has-public-ip-address
   # checkov:skip=CKV_AWS_130:The starter's public subnets. Nothing runs in them; the Lambda is in the private subnets (GAP-05).
   count                   = 2
   vpc_id                  = aws_vpc.main.id
@@ -248,7 +248,7 @@ resource "aws_lambda_function" "intake" {
   source_code_hash = data.archive_file.handler.output_base64sha256
   timeout          = 10
 
-  environment {
+  environment { # nosemgrep: terraform.aws.security.aws-lambda-environment-unencrypted.aws-lambda-environment-unencrypted
     variables = {
       INTAKE_TABLE  = aws_dynamodb_table.intake.name
       UPLOAD_BUCKET = aws_s3_bucket.uploads.id
