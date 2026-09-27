@@ -1,11 +1,19 @@
 # GRC gate. On every pull request it checks the code, plans the change with a read-only
 # AWS role, and runs the HIPAA policy suite against the plan. A failed policy fails the
-# job, so the pull request cannot merge.
+# job, so the pull request cannot merge. When a change is merged to main, the same job
+# runs again with the apply role and applies the exact plan that the policy gate checked.
 name: grc-gate
 
 on:
   pull_request:
     branches: [main]
+  push:
+    branches: [main]
+
+# Two applies must never run at once. Pull request runs can be replaced by a newer push.
+concurrency:
+  group: terraform-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 # id-token lets the job ask GitHub for the signed token that AWS trusts. Nothing else.
 permissions:
@@ -15,6 +23,7 @@ permissions:
 env:
   AWS_REGION: us-east-1
   PLAN_ROLE_ARN: arn:aws:iam::650251713518:role/acme-health-pipeline-plan
+  APPLY_ROLE_ARN: arn:aws:iam::650251713518:role/acme-health-pipeline-apply
   TERRAFORM_VERSION: "1.16.1"
   OPA_VERSION: "1.19.0"
   CONFTEST_VERSION: "0.70.1"
@@ -59,10 +68,13 @@ jobs:
       - name: Break tests for the policy gate
         run: test/policy-breaks.sh
 
-      - name: Log in to AWS with the plan role
+      # Pull requests get the read-only plan role. A merge to main gets the apply role. AWS
+      # only trusts each role for the matching token, so a pull request cannot get the
+      # apply role.
+      - name: Log in to AWS
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: ${{ env.PLAN_ROLE_ARN }}
+          role-to-assume: ${{ github.event_name == 'push' && env.APPLY_ROLE_ARN || env.PLAN_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Terraform init and validate
@@ -72,13 +84,14 @@ jobs:
           terraform validate
 
       # The plan role is read-only, so it cannot take the state lock. Pull request plans
-      # never write state, so -lock=false is safe here.
+      # never write state, so -lock=false is safe there. A merge takes the lock.
       - name: Terraform plan
         working-directory: terraform
         env:
           TF_VAR_alert_email: ${{ secrets.ALERT_EMAIL }}
+          LOCK_STATE: ${{ github.event_name == 'push' }}
         run: |
-          terraform plan -lock=false -input=false -no-color -out=tfplan
+          terraform plan -lock="$LOCK_STATE" -input=false -no-color -out=tfplan
           terraform show -json tfplan > plan.json
 
       # An empty or malformed plan would pass every policy without checking anything.
@@ -88,6 +101,26 @@ jobs:
 
       - name: Policy gate (Conftest)
         run: conftest test terraform/plan.json --policy policies --all-namespaces
+
+      # Runs only on a merge to main, after the guard and the policy gate have passed. It
+      # applies the saved plan file, so what is applied is exactly what was checked.
+      - name: Terraform apply (merge to main only)
+        if: github.event_name == 'push'
+        working-directory: terraform
+        env:
+          TF_VAR_alert_email: ${{ secrets.ALERT_EMAIL }}
+        run: terraform apply -input=false -no-color tfplan
+
+      - name: Summarise the plan
+        if: always()
+        working-directory: terraform
+        run: |
+          if [ -f plan.json ]; then
+            {
+              echo "### Terraform plan"
+              jq -r '[.resource_changes[].change.actions[0]] | group_by(.) | map("\(.[0]): \(length)") | join(", ")' plan.json
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       # The plan JSON carries variable values, including the alert email. Remove them
       # before the file is kept as an artifact on a public repository.
