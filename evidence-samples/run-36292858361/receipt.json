@@ -1,0 +1,17 @@
+{
+  "schema": "acme-health-receipt/v1",
+  "run_id": "36292858361",
+  "run_url": "https://github.com/deepanbarathi-is/cgep-app-starter/actions/runs/36292858361",
+  "commit": "53996d788ce573d870ebc2a35784612843f9b2d9",
+  "vault": "acme-health-intake-evidence-5c657426",
+  "bundle_key": "runs/36292858361/evidence-36292858361-53996d788ce5.tar.gz",
+  "signature_key": "runs/36292858361/evidence-36292858361-53996d788ce5.tar.gz.sig.bundle",
+  "version_id": "EgWbN2rGM9k1PA13DGB2CLwdwj_je9pP",
+  "sha256": "6ef6b6e2b42f9e937f48b59aac331d568946891426573a4cc7e0704c99b013ec",
+  "s3_checksum_sha256_base64": "bva24rQvnpN/SLWarDMdVolGiRQmVzpMx+BwTJmwE+w=",
+  "object_lock": {
+    "mode": "GOVERNANCE",
+    "retain_until": "2026-10-27T03:57:09.190000+00:00"
+  },
+  "uploaded_at": "2026-09-27T03:57:12Z"
+}
