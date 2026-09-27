@@ -1,7 +1,8 @@
 # GRC gate. On every pull request it checks the code, plans the change with a read-only
 # AWS role, and runs the HIPAA policy suite against the plan. A failed policy fails the
 # job, so the pull request cannot merge. When a change is merged to main, the same job
-# runs again with the apply role and applies the exact plan that the policy gate checked.
+# runs again with the apply role and applies the exact plan that the policy gate checked,
+# then builds an evidence bundle, signs it with Cosign, and stores it in the evidence vault.
 name: grc-gate
 
 on:
@@ -24,6 +25,7 @@ env:
   AWS_REGION: us-east-1
   PLAN_ROLE_ARN: arn:aws:iam::650251713518:role/acme-health-pipeline-plan
   APPLY_ROLE_ARN: arn:aws:iam::650251713518:role/acme-health-pipeline-apply
+  EVIDENCE_VAULT: acme-health-intake-evidence-5c657426
   TERRAFORM_VERSION: "1.16.1"
   OPA_VERSION: "1.19.0"
   CONFTEST_VERSION: "0.70.1"
@@ -99,29 +101,6 @@ jobs:
         working-directory: terraform
         run: jq -e '(.resource_changes | type == "array") and (.resource_changes | length > 0)' plan.json
 
-      - name: Policy gate (Conftest)
-        run: conftest test terraform/plan.json --policy policies --all-namespaces
-
-      # Runs only on a merge to main, after the guard and the policy gate have passed. It
-      # applies the saved plan file, so what is applied is exactly what was checked.
-      - name: Terraform apply (merge to main only)
-        if: github.event_name == 'push'
-        working-directory: terraform
-        env:
-          TF_VAR_alert_email: ${{ secrets.ALERT_EMAIL }}
-        run: terraform apply -input=false -no-color tfplan
-
-      - name: Summarise the plan
-        if: always()
-        working-directory: terraform
-        run: |
-          if [ -f plan.json ]; then
-            {
-              echo "### Terraform plan"
-              jq -r '[.resource_changes[].change.actions[0]] | group_by(.) | map("\(.[0]): \(length)") | join(", ")' plan.json
-            } >> "$GITHUB_STEP_SUMMARY"
-          fi
-
       # The plan JSON carries variable values, including the alert email. Remove them
       # before the file is kept as an artifact on a public repository.
       - name: Redact the plan for the artifact
@@ -136,6 +115,76 @@ jobs:
             else
               jq 'del(.variables)' plan.json > plan-redacted.json
             fi
+          fi
+
+      - name: Policy gate (Conftest)
+        run: conftest test terraform/plan.json --policy policies --all-namespaces
+
+      # Runs only on a merge to main, after the guard and the policy gate have passed. It
+      # applies the saved plan file, so what is applied is exactly what was checked.
+      - name: Terraform apply (merge to main only)
+        if: github.event_name == 'push'
+        working-directory: terraform
+        env:
+          TF_VAR_alert_email: ${{ secrets.ALERT_EMAIL }}
+          ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
+        run: |
+          set -o pipefail
+          terraform apply -input=false -no-color tfplan 2>&1 | tee apply.log
+          if [ -n "$ALERT_EMAIL" ]; then sed -i "s|$ALERT_EMAIL|<redacted>|g" apply.log; fi
+
+      # Evidence, on a merge to main only and only after the apply succeeded. A pull request
+      # can never produce signed evidence.
+      - name: Install Cosign
+        if: github.event_name == 'push'
+        uses: sigstore/cosign-installer@v4.1.2
+        with:
+          cosign-release: v3.1.3
+
+      - name: Build the evidence bundle
+        if: github.event_name == 'push'
+        run: scripts/build-evidence.sh terraform/plan-redacted.json out terraform/apply.log
+
+      # Keyless signing: the job proves who it is with GitHub's token, Sigstore issues a
+      # short-lived certificate for that identity, and the signature is logged publicly in
+      # Rekor. There is no signing key to steal. The bundle is verified straight away
+      # against this exact workflow, so a bad signature never reaches the vault.
+      - name: Sign the bundle with Cosign and verify the signature
+        if: github.event_name == 'push'
+        run: |
+          set -euo pipefail
+          bundle="$(ls out/evidence-*.tar.gz)"
+          cosign sign-blob --yes --bundle "$bundle.sig.bundle" "$bundle"
+          cosign verify-blob \
+            --bundle "$bundle.sig.bundle" \
+            --certificate-identity "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/.github/workflows/grc-gate.yml@${GITHUB_REF}" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+            "$bundle"
+
+      - name: Upload the bundle and receipt to the evidence vault
+        if: github.event_name == 'push'
+        run: |
+          set -euo pipefail
+          bundle="$(ls out/evidence-*.tar.gz)"
+          scripts/upload-evidence.sh "$bundle" "$EVIDENCE_VAULT" out/receipt.json
+
+      - name: Keep the signed evidence as an artifact
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@v7
+        with:
+          name: signed-evidence
+          path: out/
+          retention-days: 90
+
+      - name: Summarise the plan
+        if: always()
+        working-directory: terraform
+        run: |
+          if [ -f plan.json ]; then
+            {
+              echo "### Terraform plan"
+              jq -r '[.resource_changes[].change.actions[0]] | group_by(.) | map("\(.[0]): \(length)") | join(", ")' plan.json
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Keep the plan as an artifact
