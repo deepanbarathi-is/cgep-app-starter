@@ -91,6 +91,9 @@ jobs:
           opa check policies --strict
           opa test policies
 
+      - name: Break tests for the empty-plan guard
+        run: test/plan-guard-breaks.sh
+
       - name: Break tests for the policy gate
         run: test/policy-breaks.sh
 
