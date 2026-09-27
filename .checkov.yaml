@@ -1,0 +1,34 @@
+# Checkov settings for this project. Every check listed under skip-check was reviewed and
+# accepted. Each one is a design decision that DESIGN.md or WRITEUP.md explains, so it is
+# skipped for every resource. Exceptions that belong to one resource are written as
+# checkov:skip comments next to that resource instead.
+framework:
+  - terraform
+directory:
+  - terraform
+compact: true
+quiet: true
+skip-check:
+  # S3 server access logs cannot be delivered to a bucket that uses KMS encryption, and GAP-01
+  # requires KMS on every bucket. Object-level logging through CloudTrail data events is on
+  # the not-doing list in DESIGN.md.
+  - CKV_AWS_18
+  # Single-region sandbox. Recovery rests on versioning and Object Lock, not replication.
+  - CKV_AWS_144
+  # Lifecycle expiry would work against retention: Object Lock on the vault, version history
+  # on the state bucket.
+  - CKV2_AWS_61
+  # Nothing consumes S3 object events.
+  - CKV2_AWS_62
+  # These keys use AWS's default key policy (account root), which has the same content as
+  # an explicit one.
+  - CKV2_AWS_64
+  # AWS Config records the four resource types the rules use, on purpose, to keep the
+  # per-item charge small (DESIGN.md).
+  - CKV2_AWS_45
+  - CKV2_AWS_48
+  # CloudTrail alerting runs through AWS Config rules and EventBridge (monitoring.tf).
+  - CKV2_AWS_10
+  # The VPC has no instances, and the Lambda only reaches the S3 and DynamoDB gateway
+  # endpoints, so flow logs would record almost nothing.
+  - CKV2_AWS_11

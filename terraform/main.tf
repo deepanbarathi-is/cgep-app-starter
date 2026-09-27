@@ -69,6 +69,14 @@ resource "aws_vpc" "main" {
   tags = { Name = "${local.name_prefix}-vpc" }
 }
 
+# CKV2_AWS_12: a VPC's default security group allows all traffic between its members.
+# Adopting it here with no rules removes that. Nothing in this project uses it.
+resource "aws_default_security_group" "main" {
+  vpc_id = aws_vpc.main.id
+
+  tags = { Name = "${local.name_prefix}-default-sg-no-rules" }
+}
+
 resource "aws_subnet" "public" {
   # checkov:skip=CKV_AWS_130:The starter's public subnets. Nothing runs in them; the Lambda is in the private subnets (GAP-05).
   count                   = 2

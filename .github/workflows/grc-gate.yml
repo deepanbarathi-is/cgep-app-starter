@@ -79,7 +79,7 @@ jobs:
       - name: Scan the Terraform (checkov)
         run: |
           pip install --quiet "checkov==${CHECKOV_VERSION}"
-          checkov -d terraform --framework terraform --compact --quiet
+          checkov --config-file .checkov.yaml
 
       - name: Check Terraform formatting
         working-directory: terraform
