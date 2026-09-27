@@ -97,4 +97,4 @@ None of these are things I forgot. Thirty days doesn't stretch to everything a m
 
 ## How to verify this
 
-`README.md` has the exact commands. In short: `opa test ./policies` runs the 57 unit tests, `test/policy-breaks.sh` and `test/plan-guard-breaks.sh` prove the gate and its guard actually reject bad input, and `scripts/verify-evidence.sh --dir evidence-samples/run-36292858361` checks a real signed bundle's integrity, signature, and recorded retention without needing any AWS credentials.
+`README.md` contains the exact copy-paste commands to verify this repository. In short: `opa test ./policies` runs the 57 unit tests, `test/policy-breaks.sh` and `test/plan-guard-breaks.sh` prove the gate and its guard actually reject bad input, and `scripts/verify-evidence.sh --dir evidence-samples/run-36292858361` checks a real signed bundle's integrity, signature, and recorded retention without needing any AWS credentials.
