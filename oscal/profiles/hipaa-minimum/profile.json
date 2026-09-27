@@ -1,0 +1,30 @@
+{
+  "profile": {
+    "uuid": "6f0a4d1c-3a2e-4a2a-9d1b-1a2b3c4d5e6f",
+    "metadata": {
+      "title": "HIPAA minimum control selection for the acme-health-intake capstone",
+      "last-modified": "2026-09-27T00:00:00Z",
+      "version": "1.0.0",
+      "oscal-version": "1.2.1"
+    },
+    "imports": [
+      {
+        "href": "catalogs/hipaa-164-subset/catalog.json",
+        "include-controls": [
+          {
+            "with-ids": [
+              "hipaa-164.308-a-7",
+              "hipaa-164.312-a-1",
+              "hipaa-164.312-a-2-iv",
+              "hipaa-164.312-b",
+              "hipaa-164.312-e-1"
+            ]
+          }
+        ]
+      }
+    ],
+    "merge": {
+      "as-is": true
+    }
+  }
+}

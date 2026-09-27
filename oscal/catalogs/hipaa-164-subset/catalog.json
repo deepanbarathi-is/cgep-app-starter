@@ -1,0 +1,103 @@
+{
+  "catalog": {
+    "uuid": "b2a8f3f0-2b1a-4c1e-9a2d-6c1e2f3a4b5c",
+    "metadata": {
+      "title": "HIPAA Security Rule, 45 CFR 164.308/164.312 - subset used by acme-health-intake",
+      "last-modified": "2026-09-27T00:00:00Z",
+      "version": "1.0.0",
+      "oscal-version": "1.2.1",
+      "remarks": "NIST publishes no official OSCAL catalog for the HIPAA Security Rule. This catalog is authored for this project so that control-implementation.source can resolve to a real file using the same HIPAA citations the Rego policies cite. OSCAL control identifiers cannot contain parentheses or start with a digit, so each control's id is a token form of its regulatory citation (164.312(a)(2)(iv) becomes hipaa-164.312-a-2-iv), the same convention NIST 800-53 uses (writing AC-3 as ac-3). The exact citation with its original punctuation appears in the control's title, its statement text, and a hipaa-citation property, so nothing is invented, only made into a valid identifier. Control text is drawn from 45 CFR 164.308 and 164.312 and from NIST SP 800-66 Rev. 2 (Implementing the HIPAA Security Rule), the standard NIST reference for these sections, cited below.",
+      "links": [
+        {
+          "rel": "reference",
+          "href": "https://doi.org/10.6028/NIST.SP.800-66r2",
+          "text": "NIST SP 800-66 Rev. 2, Implementing the HIPAA Security Rule"
+        }
+      ]
+    },
+    "groups": [
+      {
+        "id": "hipaa-164.308",
+        "title": "45 CFR 164.308 - Administrative Safeguards",
+        "controls": [
+          {
+            "id": "hipaa-164.308-a-7",
+            "title": "164.308(a)(7) Contingency Plan",
+            "props": [
+              { "name": "hipaa-citation", "value": "164.308(a)(7)" }
+            ],
+            "parts": [
+              {
+                "id": "hipaa-164.308-a-7-smt",
+                "name": "statement",
+                "prose": "45 CFR 164.308(a)(7): establish (and implement as needed) policies and procedures for responding to an emergency or other occurrence that damages systems containing electronic protected health information, including data backup and disaster recovery."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "hipaa-164.312",
+        "title": "45 CFR 164.312 - Technical Safeguards",
+        "controls": [
+          {
+            "id": "hipaa-164.312-a-1",
+            "title": "164.312(a)(1) Access Control",
+            "props": [
+              { "name": "hipaa-citation", "value": "164.312(a)(1)" }
+            ],
+            "parts": [
+              {
+                "id": "hipaa-164.312-a-1-smt",
+                "name": "statement",
+                "prose": "45 CFR 164.312(a)(1): implement technical policies and procedures for electronic information systems that maintain electronic protected health information to allow access only to those persons or software programs that have been granted access rights."
+              }
+            ]
+          },
+          {
+            "id": "hipaa-164.312-a-2-iv",
+            "title": "164.312(a)(2)(iv) Encryption and Decryption",
+            "props": [
+              { "name": "hipaa-citation", "value": "164.312(a)(2)(iv)" }
+            ],
+            "parts": [
+              {
+                "id": "hipaa-164.312-a-2-iv-smt",
+                "name": "statement",
+                "prose": "45 CFR 164.312(a)(2)(iv): implement a mechanism to encrypt and decrypt electronic protected health information."
+              }
+            ]
+          },
+          {
+            "id": "hipaa-164.312-b",
+            "title": "164.312(b) Audit Controls",
+            "props": [
+              { "name": "hipaa-citation", "value": "164.312(b)" }
+            ],
+            "parts": [
+              {
+                "id": "hipaa-164.312-b-smt",
+                "name": "statement",
+                "prose": "45 CFR 164.312(b): implement hardware, software, and/or procedural mechanisms that record and examine activity in information systems that contain or use electronic protected health information."
+              }
+            ]
+          },
+          {
+            "id": "hipaa-164.312-e-1",
+            "title": "164.312(e)(1) Transmission Security",
+            "props": [
+              { "name": "hipaa-citation", "value": "164.312(e)(1)" }
+            ],
+            "parts": [
+              {
+                "id": "hipaa-164.312-e-1-smt",
+                "name": "statement",
+                "prose": "45 CFR 164.312(e)(1): implement technical security measures to guard against unauthorized access to electronic protected health information that is being transmitted over an electronic communications network."
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

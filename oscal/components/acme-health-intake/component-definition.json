@@ -1,0 +1,344 @@
+{
+  "component-definition": {
+    "uuid": "bd211d23-1d1b-4485-8fce-938c98ce8d31",
+    "metadata": {
+      "title": "Acme Health Patient Intake API - HIPAA control implementation",
+      "last-modified": "2026-09-27T00:00:00Z",
+      "version": "1.0.0",
+      "oscal-version": "1.2.1",
+      "parties": [
+        {
+          "uuid": "ebaa7924-3b6d-4d6d-aab3-f4fc1dc40ff7",
+          "type": "organization",
+          "name": "Acme Health"
+        }
+      ]
+    },
+    "components": [
+      {
+        "uuid": "3f630a6d-5fb8-46f0-bd73-5aaf80d0b540",
+        "type": "software",
+        "title": "acme-health-intake",
+        "description": "The Patient Intake API capstone: the starter's Lambda, DynamoDB table, S3 uploads bucket, and API Gateway, hardened by the Terraform in this repository, checked by the Rego policies in policies/, and deployed and evidenced by .github/workflows/grc-gate.yml.",
+        "purpose": "Accept patient intake submissions and store them under HIPAA Security Rule technical safeguards.",
+        "responsible-roles": [
+          {
+            "role-id": "provider",
+            "party-uuids": [
+              "ebaa7924-3b6d-4d6d-aab3-f4fc1dc40ff7"
+            ]
+          }
+        ],
+        "control-implementations": [
+          {
+            "uuid": "4aca1910-01c7-4c9d-b5ee-71f4a7738f2b",
+            "source": "catalogs/hipaa-164-subset/catalog.json",
+            "description": "HIPAA Security Rule (45 CFR 164.308/164.312) requirements this component implements, as declared in DESIGN.md and WRITEUP.md. Control identifiers are the token form of the regulatory citation (see the catalog's remarks); the citation itself is repeated on every requirement below as a hipaa-citation prop.",
+            "implemented-requirements": [
+              {
+                "uuid": "72a8e528-1eab-4ed0-9c80-127663bc6c31",
+                "control-id": "hipaa-164.312-a-2-iv",
+                "description": "The uploads bucket's default encryption uses a customer-managed KMS key with rotation enabled, applied by the compliant-storage module (GAP-01). Enforced by policies/hipaa_312a2iv_s3_kms.rego.",
+                "props": [
+                  {
+                    "name": "hipaa-citation",
+                    "value": "164.312(a)(2)(iv)"
+                  },
+                  {
+                    "name": "implementation-status",
+                    "value": "implemented"
+                  },
+                  {
+                    "name": "terraform-resource",
+                    "value": "module.uploads_storage.aws_kms_key.this"
+                  },
+                  {
+                    "name": "terraform-resource",
+                    "value": "module.uploads_storage.aws_s3_bucket_server_side_encryption_configuration.this"
+                  },
+                  {
+                    "name": "gap",
+                    "value": "GAP-01"
+                  },
+                  {
+                    "name": "soc2-cross-reference",
+                    "value": "CC6.1"
+                  },
+                  {
+                    "name": "cmmc-cross-reference",
+                    "value": "SC.L2-3.13.11"
+                  }
+                ],
+                "links": [
+                  {
+                    "rel": "evidence",
+                    "href": "s3://acme-health-intake-evidence-5c657426/runs/36302030450/evidence-36302030450-097bbd26fe00.tar.gz",
+                    "text": "Signed pipeline bundle containing terraform plan.json for this control."
+                  }
+                ]
+              },
+              {
+                "uuid": "ec21263f-92f1-4fbc-86ab-303645fea140",
+                "control-id": "hipaa-164.312-a-2-iv",
+                "description": "The submissions table's server-side encryption uses a dedicated customer-managed KMS key with rotation enabled (GAP-02). Enforced by policies/hipaa_312a2iv_dynamodb_cmk.rego.",
+                "props": [
+                  {
+                    "name": "hipaa-citation",
+                    "value": "164.312(a)(2)(iv)"
+                  },
+                  {
+                    "name": "implementation-status",
+                    "value": "implemented"
+                  },
+                  {
+                    "name": "terraform-resource",
+                    "value": "aws_kms_key.dynamodb"
+                  },
+                  {
+                    "name": "terraform-resource",
+                    "value": "aws_dynamodb_table.intake"
+                  },
+                  {
+                    "name": "gap",
+                    "value": "GAP-02"
+                  },
+                  {
+                    "name": "soc2-cross-reference",
+                    "value": "CC6.1"
+                  },
+                  {
+                    "name": "cmmc-cross-reference",
+                    "value": "SC.L2-3.13.11"
+                  }
+                ],
+                "links": [
+                  {
+                    "rel": "evidence",
+                    "href": "s3://acme-health-intake-evidence-5c657426/runs/36302030450/evidence-36302030450-097bbd26fe00.tar.gz",
+                    "text": "Signed pipeline bundle containing terraform plan.json for this control."
+                  }
+                ]
+              },
+              {
+                "uuid": "892dfcfb-d5f9-4d9b-9b28-31248311da73",
+                "control-id": "hipaa-164.312-e-1",
+                "description": "The uploads, evidence, config, and state buckets each carry a policy denying any request where aws:SecureTransport is false, covering the bucket and its objects (GAP-03). Enforced by policies/hipaa_312e1_s3_tls_only.rego.",
+                "props": [
+                  {
+                    "name": "hipaa-citation",
+                    "value": "164.312(e)(1)"
+                  },
+                  {
+                    "name": "implementation-status",
+                    "value": "implemented"
+                  },
+                  {
+                    "name": "terraform-resource",
+                    "value": "aws_s3_bucket_policy.uploads_tls_only"
+                  },
+                  {
+                    "name": "gap",
+                    "value": "GAP-03"
+                  },
+                  {
+                    "name": "soc2-cross-reference",
+                    "value": "CC6.7"
+                  }
+                ],
+                "links": [
+                  {
+                    "rel": "evidence",
+                    "href": "s3://acme-health-intake-evidence-5c657426/runs/36302030450/evidence-36302030450-097bbd26fe00.tar.gz",
+                    "text": "Signed pipeline bundle containing terraform plan.json for this control."
+                  }
+                ]
+              },
+              {
+                "uuid": "ebb49482-5ab3-4a8d-8638-ca9d98771edf",
+                "control-id": "hipaa-164.312-e-1",
+                "description": "The intake Lambda runs in the private subnets of the starter's VPC, reaching S3 and DynamoDB only through gateway endpoints, with a security group that allows no inbound traffic (GAP-05). Enforced by policies/hipaa_312e1_lambda_vpc.rego.",
+                "props": [
+                  {
+                    "name": "hipaa-citation",
+                    "value": "164.312(e)(1)"
+                  },
+                  {
+                    "name": "implementation-status",
+                    "value": "implemented"
+                  },
+                  {
+                    "name": "terraform-resource",
+                    "value": "aws_lambda_function.intake"
+                  },
+                  {
+                    "name": "terraform-resource",
+                    "value": "aws_security_group.lambda"
+                  },
+                  {
+                    "name": "gap",
+                    "value": "GAP-05"
+                  },
+                  {
+                    "name": "soc2-cross-reference",
+                    "value": "CC6.6"
+                  },
+                  {
+                    "name": "cmmc-cross-reference",
+                    "value": "SC.L2-3.13.1"
+                  }
+                ],
+                "links": [
+                  {
+                    "rel": "evidence",
+                    "href": "s3://acme-health-intake-evidence-5c657426/runs/36302030450/evidence-36302030450-097bbd26fe00.tar.gz",
+                    "text": "Signed pipeline bundle containing terraform plan.json for this control."
+                  }
+                ]
+              },
+              {
+                "uuid": "854948b7-9cbe-4098-a48e-f4f583aeabc2",
+                "control-id": "hipaa-164.312-a-1",
+                "description": "The intake Lambda's role is limited to dynamodb:PutItem, s3:PutObject on the uploads prefix, the two KMS actions it needs, and X-Ray tracing, in place of the starter's dynamodb:* and s3:* (GAP-07). Enforced by policies/hipaa_312a1_iam_least_privilege.rego, which denies any identity policy allowing * or a service-wide wildcard.",
+                "props": [
+                  {
+                    "name": "hipaa-citation",
+                    "value": "164.312(a)(1)"
+                  },
+                  {
+                    "name": "implementation-status",
+                    "value": "implemented"
+                  },
+                  {
+                    "name": "terraform-resource",
+                    "value": "aws_iam_role_policy.lambda_inline"
+                  },
+                  {
+                    "name": "gap",
+                    "value": "GAP-07"
+                  },
+                  {
+                    "name": "soc2-cross-reference",
+                    "value": "CC6.3"
+                  },
+                  {
+                    "name": "cmmc-cross-reference",
+                    "value": "AC.L2-3.1.5"
+                  }
+                ],
+                "links": [
+                  {
+                    "rel": "evidence",
+                    "href": "s3://acme-health-intake-evidence-5c657426/runs/36302030450/evidence-36302030450-097bbd26fe00.tar.gz",
+                    "text": "Signed pipeline bundle containing terraform plan.json for this control."
+                  }
+                ]
+              },
+              {
+                "uuid": "3ff789d7-5dd2-4a47-9739-95c82757e090",
+                "control-id": "hipaa-164.308-a-7",
+                "description": "The uploads, evidence, config, and state buckets have versioning enabled (module.compliant-storage), and the submissions table has point-in-time recovery enabled, so overwritten or deleted PHI can be recovered (GAP-04).",
+                "props": [
+                  {
+                    "name": "hipaa-citation",
+                    "value": "164.308(a)(7)"
+                  },
+                  {
+                    "name": "implementation-status",
+                    "value": "implemented"
+                  },
+                  {
+                    "name": "terraform-resource",
+                    "value": "module.uploads_storage.aws_s3_bucket_versioning.this"
+                  },
+                  {
+                    "name": "terraform-resource",
+                    "value": "aws_dynamodb_table.intake"
+                  },
+                  {
+                    "name": "gap",
+                    "value": "GAP-04"
+                  }
+                ],
+                "links": [
+                  {
+                    "rel": "evidence",
+                    "href": "s3://acme-health-intake-evidence-5c657426/runs/36302030450/evidence-36302030450-097bbd26fe00.tar.gz",
+                    "text": "Signed pipeline bundle containing terraform plan.json for this control."
+                  }
+                ]
+              },
+              {
+                "uuid": "f8fd375e-1b16-4e4d-a9f6-9e2ab3e1c1d2",
+                "control-id": "hipaa-164.312-b",
+                "description": "A multi-region CloudTrail with log-file validation records account activity, encrypted with a dedicated KMS key and delivered to a bucket with its own TLS-deny policy. AWS Config runs six managed rules against the S3, DynamoDB, Lambda, and API Gateway resources this component uses, and EventBridge routes NON_COMPLIANT findings to an encrypted SNS topic.",
+                "props": [
+                  {
+                    "name": "hipaa-citation",
+                    "value": "164.312(b)"
+                  },
+                  {
+                    "name": "implementation-status",
+                    "value": "implemented"
+                  },
+                  {
+                    "name": "terraform-resource",
+                    "value": "aws_cloudtrail.main"
+                  },
+                  {
+                    "name": "terraform-resource",
+                    "value": "aws_config_configuration_recorder.main"
+                  },
+                  {
+                    "name": "terraform-resource",
+                    "value": "aws_sns_topic.compliance_alerts"
+                  }
+                ],
+                "links": [
+                  {
+                    "rel": "evidence",
+                    "href": "s3://acme-health-intake-evidence-5c657426/runs/36302030450/evidence-36302030450-097bbd26fe00.tar.gz",
+                    "text": "Signed pipeline bundle containing terraform plan.json for this control."
+                  }
+                ]
+              },
+              {
+                "uuid": "a2dfe4a2-f8d8-4c2c-894e-5cb7d08b72f2",
+                "control-id": "hipaa-164.312-b",
+                "description": "The pipeline signs each evidence bundle with Cosign (keyless, via GitHub OIDC) and uploads it to an S3 bucket with Object Lock in GOVERNANCE mode and a 30-day default retention, so a bundle cannot be silently altered or deleted once written.",
+                "props": [
+                  {
+                    "name": "hipaa-citation",
+                    "value": "164.312(b)"
+                  },
+                  {
+                    "name": "implementation-status",
+                    "value": "implemented"
+                  },
+                  {
+                    "name": "terraform-resource",
+                    "value": "aws_s3_bucket_object_lock_configuration.evidence"
+                  },
+                  {
+                    "name": "pipeline-step",
+                    "value": ".github/workflows/grc-gate.yml: Sign the bundle with Cosign and verify the signature"
+                  },
+                  {
+                    "name": "pipeline-step",
+                    "value": ".github/workflows/grc-gate.yml: Upload the bundle and receipt to the evidence vault"
+                  }
+                ],
+                "links": [
+                  {
+                    "rel": "evidence",
+                    "href": "s3://acme-health-intake-evidence-5c657426/runs/36302030450/evidence-36302030450-097bbd26fe00.tar.gz",
+                    "text": "Signed pipeline bundle uploaded to the evidence vault. scripts/verify-evidence.sh --dir evidence-samples/run-36292858361 checks a committed copy offline; --run <id> checks any run live."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
